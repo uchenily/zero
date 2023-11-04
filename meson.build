@@ -15,3 +15,4 @@ dependencies = []
 dependencies += fmt_dep
 
 subdir('src')
+subdir('tests')
