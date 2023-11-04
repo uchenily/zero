@@ -6,6 +6,7 @@
 #include <cstring>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace zero {
 namespace CmdLine {
@@ -64,6 +65,8 @@ private:
     bool m_required;
 };
 
+static std::vector<Opt> g_positional;
+
 void StrOptRequired(std::string *value, std::string name) {
     g_opts[std::move(name)] = Opt(value, "", true);
 }
@@ -76,14 +79,30 @@ void BoolOpt(bool *value, std::string name) {
     g_opts[std::move(name)] = Opt(value, false, false);
 }
 
-static int ParseOpt(int argc, char *argv[], int &parse_index) {
+void StrPositional(std::string *value) {
+    Opt opt{value, "", false};
+    g_positional.emplace_back(opt);
+}
+
+static int
+ParseOpt(int argc, char *argv[], int &parse_index, int &positional_index) {
     // 解析包括必选和可选参数
     char *opt = argv[parse_index];
     size_t opt_len = strlen(opt);
-    expect(opt_len >= 2);
-    expect(opt[0] == '-' && opt[1] == '-');
-    opt += 2;
-    opt_len -= 2;
+    if (opt[0] == '-') {
+        // 暂时只考虑 -- 开头的option 参数
+        expect(opt_len >= 2);
+        expect(opt[0] == '-' && opt[1] == '-');
+        opt += 2;
+        opt_len -= 2;
+    } else {
+        // positional 参数
+        std::string positional_argument{opt};
+        g_positional[positional_index].SetValue(positional_argument);
+        positional_index++;
+        parse_index++;
+        return 0;
+    }
 
     // 执行到这里说明是一个选项, 接下来判断这个选项是否已经指定了参数
     bool has_argument = false;
@@ -142,9 +161,10 @@ int Parse(int argc, char *argv[]) {
     expect(g_usage != nullptr);
 
     int parse_index = 1;
+    int positional_index = 0;
     int retval = 0;
     while (parse_index < argc) {
-        retval = ParseOpt(argc, argv, parse_index);
+        retval = ParseOpt(argc, argv, parse_index, positional_index);
         if (retval != 0) {
             return retval;
         }

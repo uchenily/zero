@@ -1,6 +1,7 @@
 source_files = files(
   'cmdline.cpp',
   'token.cpp',
+  'lexer.cpp',
 )
 
 zero_lib = library('zero',
