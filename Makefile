@@ -6,6 +6,9 @@ compile:
 setup:
 	meson setup --reconfigure build
 
+install:
+	meson install -C build
+
 lint:
 	pre-commit run -a
 
