@@ -1,5 +1,6 @@
 source_files = files(
   'cmdline.cpp',
+  'token.cpp',
 )
 
 zero_lib = library('zero',
