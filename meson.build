@@ -2,6 +2,7 @@ project('zero', 'cpp',
   version: '0.0.1',
   default_options: [
     'buildtype=release',
+    'default_library=static',
     'cpp_std=c++20',
     'warning_level=3'],
   meson_version: '>=1.0.0')
