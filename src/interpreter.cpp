@@ -116,6 +116,36 @@ std::any Interpreter::visit_assign_expr(Assign *expr) {
     return {};
 }
 
+std::any Interpreter::visit_block_stmt(Block *stmt) {
+    execute_block(stmt->statements, std::make_unique<Environment>(environment));
+
+    return {};
+}
+
+std::any Interpreter::visit_expression_stmt(Expression *stmt) {
+    evaluate(stmt->expression);
+
+    return {};
+}
+
+std::any Interpreter::visit_print_stmt(Print *stmt) {
+    std::any value = evaluate(stmt->expression);
+    fmt::println("{}", stringify(value));
+
+    return {};
+}
+
+std::any Interpreter::visit_var_stmt(Var *stmt) {
+    std::any value = nullptr;
+    if (stmt->initializer != nullptr) {
+        value = evaluate(stmt->initializer);
+    }
+
+    environment->define(stmt->name.lexeme, std::move(value));
+
+    return {};
+}
+
 void Interpreter::check_number_operand(const Token &op,
                                        const std::any &operand) {
     if (operand.type() == typeid(int)) {
