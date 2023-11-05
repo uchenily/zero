@@ -25,10 +25,10 @@ void Interpreter::execute(const std::unique_ptr<Stmt> &stmt) {
 
 void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
                                 std::unique_ptr<Environment> env) {
-    expect(this->environment != nullptr);
-    expect(env != nullptr);
+    // expect(this->environment != nullptr);
+    // expect(env != nullptr);
     // 保存Env
-    std::unique_ptr<Environment> previous = std::move(this->environment);
+    // std::unique_ptr<Environment> previous = std::move(this->environment);
     try {
         this->environment = std::move(env);
 
@@ -36,15 +36,17 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
             execute(stmt);
         }
     } catch (...) {
-        this->environment = std::move(previous);
+        // this->environment = std::move(previous);
+        this->environment = this->environment->get_enclosing();
         throw;
     }
 
     // 恢复Env
-    env = std::move(this->environment);
-    this->environment = std::move(previous);
-    expect(this->environment != nullptr);
-    expect(env != nullptr);
+    // env = std::move(this->environment);
+    // this->environment = std::move(previous);
+    // expect(this->environment != nullptr);
+    // expect(env != nullptr);
+    this->environment = this->environment->get_enclosing();
 }
 
 std::any Interpreter::visit_binary_expr(Binary *expr) {
@@ -89,6 +91,8 @@ std::any Interpreter::visit_binary_expr(Binary *expr) {
         case token_type::STAR:
             check_number_operands(expr->op, left, right);
             return std::any_cast<int>(left) * std::any_cast<int>(right);
+        default:
+            break;
     }
 
     return {};
@@ -125,6 +129,8 @@ std::any Interpreter::visit_unary_expr(Unary *expr) {
         case token_type::MINUS:
             check_number_operand(expr->op, right);
             return -std::any_cast<int>(right);
+        default:
+            break;
     }
 
     return {};
@@ -143,7 +149,9 @@ std::any Interpreter::visit_assign_expr(Assign *expr) {
 
 std::any Interpreter::visit_block_stmt(Block *stmt) {
     // 进入block, 创建一个新的environment
-    execute_block(stmt->statements, std::make_unique<Environment>());
+    // execute_block(stmt->statements, std::make_unique<Environment>());
+    execute_block(stmt->statements,
+                  std::make_unique<Environment>(std::move(environment)));
 
     return {};
 }

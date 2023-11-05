@@ -25,12 +25,22 @@ std::unique_ptr<Stmt> Parser::declaration() {
 
         return statement();
     } catch (const ParseError &err) {
+        VM::parse_error(err.token, err.what());
         synchronize();
         return nullptr;
     }
 }
 
 std::unique_ptr<Stmt> Parser::statement() {
+    if (match(token_type::IF)) {
+        return if_statement();
+    }
+    if (match(token_type::FOR)) {
+        return for_statement();
+    }
+    if (match(token_type::WHILE)) {
+        return while_statement();
+    }
     if (match(token_type::PRINT)) {
         return print_statement();
     }
@@ -39,6 +49,78 @@ std::unique_ptr<Stmt> Parser::statement() {
     }
 
     return expr_statement();
+}
+
+std::unique_ptr<Stmt> Parser::for_statement() {
+    consume(token_type::LEFT_PAREN, "Expect '(' after for");
+
+    std::unique_ptr<Stmt> initializer;
+    if (match(token_type::SEMICOLON)) {
+        initializer = nullptr;
+    } else if (match(token_type::LET)) {
+        initializer = var_declaration();
+    } else {
+        initializer = expr_statement();
+    }
+
+    std::unique_ptr<Expr> cond = nullptr;
+    if (!check(token_type::SEMICOLON)) {
+        cond = expression();
+    }
+    consume(token_type::SEMICOLON, "Expect ';' after loop condition.");
+
+    std::unique_ptr<Expr> increment = nullptr;
+    if (!check(token_type::RIGHT_PAREN)) {
+        increment = expression();
+    }
+    consume(token_type::RIGHT_PAREN, "Expect ')' after for clauses.");
+    std::unique_ptr<Stmt> body = statement();
+
+    if (increment != nullptr) {
+        std::vector<std::unique_ptr<Stmt>> statements;
+        statements.push_back(std::move(body));
+        statements.push_back(
+            std::make_unique<Expression>(std::move(increment)));
+        body = std::make_unique<Block>(std::move(statements));
+    }
+
+    if (cond == nullptr) {
+        cond = std::make_unique<Literal>(true);
+    }
+    body = std::make_unique<While>(std::move(cond), std::move(body));
+
+    if (initializer != nullptr) {
+        std::vector<std::unique_ptr<Stmt>> statements;
+        statements.push_back(std::move(initializer));
+        statements.push_back(std::move(body));
+        body = std::make_unique<Block>(std::move(statements));
+    }
+
+    return body;
+}
+
+std::unique_ptr<Stmt> Parser::if_statement() {
+    consume(token_type::LEFT_PAREN, "Expect '(' after if.");
+    std::unique_ptr<Expr> cond = expression();
+    consume(token_type::RIGHT_PAREN, "Expect ')' after if condition.");
+
+    std::unique_ptr<Stmt> then_branch = statement();
+    std::unique_ptr<Stmt> else_branch = nullptr;
+    if (match(token_type::ELSE)) {
+        else_branch = statement();
+    }
+
+    return std::make_unique<If>(
+        std::move(cond), std::move(then_branch), std::move(else_branch));
+}
+
+std::unique_ptr<Stmt> Parser::while_statement() {
+    consume(token_type::LEFT_PAREN, "Expect '(' after while.");
+    std::unique_ptr<Expr> cond = expression();
+    consume(token_type::RIGHT_PAREN, "Expect ')' after condition.");
+    std::unique_ptr<Stmt> body = statement();
+
+    return std::make_unique<While>(std::move(cond), std::move(body));
 }
 
 std::unique_ptr<Stmt> Parser::print_statement() {
@@ -248,6 +330,8 @@ void Parser::synchronize() {
             case token_type::PRINT:
             case token_type::RETURN:
                 return;
+            default:
+                break;
         }
         advance();
     }

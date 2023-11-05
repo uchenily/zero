@@ -17,6 +17,10 @@ public:
     void assign(const Token &name, std::any value);
     void define(const std::string &name, std::any value);
 
+    std::unique_ptr<Environment> get_enclosing() {
+        return std::move(this->enclosing);
+    }
+
 private:
     std::unique_ptr<Environment> enclosing;
     std::map<std::string, std::any> values;
