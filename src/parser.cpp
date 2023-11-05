@@ -176,6 +176,9 @@ std::unique_ptr<Expr> Parser::primary() {
     if (match(token_type::NUMBER, token_type::STRING)) {
         return std::make_unique<Literal>(previous().literal);
     }
+    if (match(token_type::IDENTIFIER)) {
+        return std::make_unique<Variable>(previous());
+    }
     if (match(token_type::LEFT_PAREN)) {
         std::unique_ptr<Expr> expr = expression();
         consume(token_type::RIGHT_PAREN, "Expect ')' after expression.");
@@ -244,7 +247,7 @@ void Parser::synchronize() {
             case token_type::WHILE:
             case token_type::PRINT:
             case token_type::RETURN:
-                break;
+                return;
         }
         advance();
     }

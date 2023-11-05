@@ -1,7 +1,7 @@
 project('zero', 'cpp',
   version: '0.0.1',
   default_options: [
-    'buildtype=release',
+    'buildtype=debug',
     'default_library=static',
     'cpp_std=c++20',
     'warning_level=3'],
