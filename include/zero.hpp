@@ -10,7 +10,7 @@ class VM {
 public:
     static void run_REPL();
     static void run_file(const std::string &filepath);
-    static void parse_error(unsigned int line, const std::string &msg);
+    // static void parse_error(unsigned int line, const std::string &msg);
     static void parse_error(const Token &token, const std::string &msg);
     static void runtime_error(const RuntimeError &err);
 

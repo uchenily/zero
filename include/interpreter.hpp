@@ -6,9 +6,9 @@
 namespace zero {
 struct RuntimeError : public std::runtime_error {
     RuntimeError(const Token &token, const std::string &msg)
-        : std::runtime_error{msg.data()}, token{token} {}
+        : std::runtime_error{msg}, token{token} {}
 
-    const Token &token;
+    const Token token;
 };
 
 class Interpreter : public ExprVisitor, public StmtVisitor {

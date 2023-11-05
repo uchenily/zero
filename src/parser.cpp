@@ -8,9 +8,13 @@ namespace zero {
 
 std::vector<std::unique_ptr<Stmt>> Parser::parse() {
     std::vector<std::unique_ptr<Stmt>> statements;
-
-    while (!is_at_end()) {
-        statements.push_back(declaration());
+    try {
+        while (!is_at_end()) {
+            statements.push_back(declaration());
+        }
+    } catch (const ParseError &err) {
+        VM::parse_error(err.token, err.what());
+        // synchronize();
     }
     return statements;
 }
@@ -18,17 +22,17 @@ std::vector<std::unique_ptr<Stmt>> Parser::parse() {
 std::unique_ptr<Expr> Parser::expression() { return assignment(); }
 
 std::unique_ptr<Stmt> Parser::declaration() {
-    try {
-        if (match(token_type::LET)) {
-            return var_declaration();
-        }
-
-        return statement();
-    } catch (const ParseError &err) {
-        VM::parse_error(err.token, err.what());
-        synchronize();
-        return nullptr;
+    // try {
+    if (match(token_type::LET)) {
+        return var_declaration();
     }
+
+    return statement();
+    //} catch (const ParseError &err) {
+    // VM::parse_error(err.token, err.what());
+    // synchronize();
+    // return nullptr;
+    // }
 }
 
 std::unique_ptr<Stmt> Parser::statement() {

@@ -71,6 +71,9 @@ void VM::run_REPL() {
             break;
         }
         run(user_input);
+
+        // 下一轮重置状态
+        has_parse_error = false;
     }
 }
 

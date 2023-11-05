@@ -17,9 +17,9 @@ public:
 private:
     struct ParseError : public std::runtime_error {
         ParseError(const Token &token, const std::string &msg)
-            : std::runtime_error{msg.data()}, token{token} {}
+            : std::runtime_error{msg}, token{token} {}
 
-        const Token &token;
+        const Token token;
     };
     std::unique_ptr<Expr> expression();
     std::unique_ptr<Stmt> declaration();
