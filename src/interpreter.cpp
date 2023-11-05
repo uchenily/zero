@@ -94,6 +94,11 @@ std::any Interpreter::visit_variable_expr(Variable *expr) {
     return {};
 }
 
+std::any Interpreter::visit_assign_expr(Assign *expr) {
+    // TODO
+    return {};
+}
+
 void Interpreter::check_number_operand(const Token &op,
                                        const std::any &operand) {
     if (operand.type() == typeid(int)) {

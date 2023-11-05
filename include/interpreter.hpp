@@ -19,6 +19,7 @@ public:
     std::any visit_literal_expr(Literal *expr) override;
     std::any visit_unary_expr(Unary *expr) override;
     std::any visit_variable_expr(Variable *expr) override;
+    std::any visit_assign_expr(Assign *expr) override;
 
     // Stmt抽象类方法
     std::any visit_block_stmt(Block *stmt) override;

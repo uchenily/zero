@@ -11,6 +11,7 @@ struct Grouping;
 struct Literal;
 struct Unary;
 struct Variable;
+struct Assign;
 
 struct ExprVisitor {
     virtual std::any visit_binary_expr(Binary *expr) = 0;
@@ -18,6 +19,7 @@ struct ExprVisitor {
     virtual std::any visit_literal_expr(Literal *expr) = 0;
     virtual std::any visit_unary_expr(Unary *expr) = 0;
     virtual std::any visit_variable_expr(Variable *expr) = 0;
+    virtual std::any visit_assign_expr(Assign *expr) = 0;
     virtual ~ExprVisitor() = default;
 };
 
@@ -77,4 +79,17 @@ struct Variable : Expr {
 
     const Token name;
 };
+
+struct Assign : Expr {
+    Assign(Token name, std::shared_ptr<Expr> value)
+        : name(std::move(name)), value(std::move(value)){};
+
+    std::any accept(ExprVisitor &visitor) override {
+        return visitor.visit_assign_expr(this);
+    }
+
+    const Token name;
+    const std::shared_ptr<Expr> value;
+};
+
 } // namespace zero
