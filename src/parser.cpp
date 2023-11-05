@@ -282,7 +282,7 @@ bool Parser::match(T... type) {
     return false;
 }
 
-Token Parser::consume(token_type type, const std::string_view msg) {
+Token Parser::consume(token_type type, const std::string &msg) {
     if (check(type)) {
         return advance();
     }

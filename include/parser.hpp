@@ -16,7 +16,7 @@ public:
 
 private:
     struct ParseError : public std::runtime_error {
-        ParseError(const Token &token, std::string_view msg)
+        ParseError(const Token &token, const std::string &msg)
             : std::runtime_error{msg.data()}, token{token} {}
 
         const Token &token;
@@ -40,7 +40,7 @@ private:
     std::unique_ptr<Expr> primary();
     template <class... T>
     bool match(T... type);
-    Token consume(token_type type, const std::string_view msg);
+    Token consume(token_type type, const std::string &msg);
     Token advance();
     Token peek();
     Token previous();

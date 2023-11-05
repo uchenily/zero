@@ -76,11 +76,11 @@ void VM::run_REPL() {
 
 void VM::report(unsigned int line,
                 const std::string &pos,
-                const std::string_view reason) {
+                const std::string &reason) {
     fmt::println("[Line {}] Error {}: {}", line, pos, reason);
 }
 
-void VM::parse_error(const Token &token, const std::string_view msg) {
+void VM::parse_error(const Token &token, const std::string &msg) {
     if (token.type == token_type::END) {
         report(token.line, "at end", msg);
     } else {

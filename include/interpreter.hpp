@@ -5,7 +5,7 @@
 
 namespace zero {
 struct RuntimeError : public std::runtime_error {
-    RuntimeError(const Token &token, std::string_view msg)
+    RuntimeError(const Token &token, const std::string &msg)
         : std::runtime_error{msg.data()}, token{token} {}
 
     const Token &token;
