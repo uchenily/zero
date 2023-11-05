@@ -7,6 +7,7 @@
 #include "parser.hpp"
 #include "token.hpp"
 
+#include <csignal>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -32,6 +33,10 @@ void VM::run(std::string source) {
     // 解释器
     Interpreter interpreter{};
     interpreter.interpret(statements);
+
+    if (has_runtime_error) {
+        return;
+    }
 }
 
 void VM::run_file(const std::string &file) {
@@ -42,11 +47,29 @@ void VM::run_file(const std::string &file) {
     run(buf.str());
 }
 
+static void signal_handler(int signal) {
+    if (signal == SIGINT) {
+        fmt::println("Ctrl+C received. Exiting...");
+        exit(signal);
+    }
+}
+
 void VM::run_REPL() {
     std::string user_input;
+
+    // 注册信号处理函数
+    signal(SIGINT, signal_handler);
     while (true) {
         fmt::print("> ");
         std::getline(std::cin, user_input);
+        if (std::cin.eof()) {
+            fmt::println("EOF reached. Exiting...");
+            break;
+        }
+        if (std::cin.fail()) {
+            fmt::println("Input error. Exiting...");
+            break;
+        }
         run(user_input);
     }
 }
