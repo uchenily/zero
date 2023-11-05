@@ -107,17 +107,19 @@ std::any Interpreter::visit_unary_expr(Unary *expr) {
 }
 
 std::any Interpreter::visit_variable_expr(Variable *expr) {
-    // TODO
-    return {};
+    return environment->get(expr->name);
 }
 
 std::any Interpreter::visit_assign_expr(Assign *expr) {
-    // TODO
-    return {};
+    std::any value = evaluate(expr->value);
+    environment->assign(expr->name, value);
+
+    return value;
 }
 
 std::any Interpreter::visit_block_stmt(Block *stmt) {
-    execute_block(stmt->statements, std::make_unique<Environment>(environment));
+    execute_block(stmt->statements,
+                  std::make_unique<Environment>(std::move(environment)));
 
     return {};
 }

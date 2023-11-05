@@ -1,6 +1,7 @@
 #pragma once
 
 #include "expr.hpp"
+#include "stmt.hpp"
 #include "token.hpp"
 
 #include <memory>
@@ -11,7 +12,7 @@ namespace zero {
 class Parser {
 public:
     explicit Parser(const std::vector<Token> &tokens) : tokens(tokens){};
-    std::unique_ptr<Expr> parse();
+    std::vector<std::unique_ptr<Stmt>> parse();
 
 private:
     struct ParseError : public std::runtime_error {
@@ -21,6 +22,13 @@ private:
         const Token &token;
     };
     std::unique_ptr<Expr> expression();
+    std::unique_ptr<Stmt> declaration();
+    std::unique_ptr<Stmt> statement();
+    std::unique_ptr<Stmt> print_statement();
+    std::unique_ptr<Stmt> var_declaration();
+    std::unique_ptr<Stmt> expr_statement();
+    std::vector<std::unique_ptr<Stmt>> block();
+    std::unique_ptr<Expr> assignment();
     std::unique_ptr<Expr> equality();
     std::unique_ptr<Expr> comparison();
     std::unique_ptr<Expr> term();

@@ -81,7 +81,7 @@ struct Variable : Expr {
 };
 
 struct Assign : Expr {
-    Assign(Token name, std::shared_ptr<Expr> value)
+    Assign(Token name, std::unique_ptr<Expr> value)
         : name(std::move(name)), value(std::move(value)){};
 
     std::any accept(ExprVisitor &visitor) override {
@@ -89,7 +89,7 @@ struct Assign : Expr {
     }
 
     const Token name;
-    const std::shared_ptr<Expr> value;
+    const std::unique_ptr<Expr> value;
 };
 
 } // namespace zero

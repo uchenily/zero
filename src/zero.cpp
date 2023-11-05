@@ -23,15 +23,15 @@ void VM::run(std::string source) {
 
     // 语法解析
     Parser parser{tokens};
-    auto expr = parser.parse();
+    auto statements = parser.parse();
 
     if (has_parse_error) {
         return;
     }
 
     // 解释器
-    Interpreter interpreter;
-    interpreter.interpret(expr);
+    Interpreter interpreter{};
+    interpreter.interpret(statements);
 }
 
 void VM::run_file(const std::string &file) {
