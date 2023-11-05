@@ -9,13 +9,14 @@ struct RuntimeError : public std::runtime_error {
     const Token &token;
 };
 
-class Interpreter : public Visitor {
+class Interpreter : public ExprVisitor {
 public:
     void interpret(const std::unique_ptr<Expr> &expr);
     std::any visit_binary_expr(Binary *expr) override;
     std::any visit_grouping_expr(Grouping *expr) override;
     std::any visit_literal_expr(Literal *expr) override;
     std::any visit_unary_expr(Unary *expr) override;
+    std::any visit_variable_expr(Variable *expr) override;
 
 private:
     std::any evaluate(const std::unique_ptr<Expr> &expr);

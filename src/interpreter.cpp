@@ -84,6 +84,11 @@ std::any Interpreter::visit_unary_expr(Unary *expr) {
     return {};
 }
 
+std::any Interpreter::visit_variable_expr(Variable *expr) {
+    // TODO
+    return {};
+}
+
 void Interpreter::check_number_operand(const Token &op,
                                        const std::any &operand) {
     if (operand.type() == typeid(int)) {
