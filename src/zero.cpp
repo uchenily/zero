@@ -44,7 +44,7 @@ void VM::report(unsigned int line,
     fmt::println("[Line {}] Error {}: {}", line, pos, reason);
 }
 
-void VM::error(const Token &token, const std::string_view msg) {
+void VM::parse_error(const Token &token, const std::string_view msg) {
     if (token.type == token_type::END) {
         report(token.line, "at end", msg);
     } else {
