@@ -1,6 +1,9 @@
+#include "zero.hpp"
+
 #include "cmdline.hpp"
 #include "fmt/core.h"
 #include "lexer.hpp"
+#include "parser.hpp"
 #include "token.hpp"
 
 #include <fstream>
@@ -10,25 +13,15 @@
 
 using namespace zero;
 
-void usage() {
-    fmt::println("./zero [file] [--help] [--verbose]");
-    fmt::println("positions:");
-    fmt::println("    file           parse and execute this file, optional");
-    fmt::println("options:");
-    fmt::println("    --help         print usage");
-    fmt::println("    --verbose      verbose message");
+void VM::run(std::string source) {
+    auto lexer = std::make_unique<Lexer>(std::move(source));
+    auto tokens = lexer->scan_tokens();
+
+    Parser parser{tokens};
+    auto expr = parser.parse();
 }
 
-void run(std::string source) {
-    std::unique_ptr<Lexer> lexer = std::make_unique<Lexer>(std::move(source));
-    std::vector<Token> tokens = lexer->scan_tokens();
-
-    for (const auto &token : tokens) {
-        fmt::println("{}", token.to_string());
-    }
-}
-
-void run_file(const std::string &file) {
+void VM::run_file(const std::string &file) {
     std::fstream source(file, std::ios::in | std::ios::binary);
     std::stringstream buf;
 
@@ -36,7 +29,7 @@ void run_file(const std::string &file) {
     run(buf.str());
 }
 
-void run_REPL() {
+void VM::run_REPL() {
     std::string user_input;
     while (true) {
         fmt::print("> ");
@@ -45,22 +38,16 @@ void run_REPL() {
     }
 }
 
-int main(int argc, char *argv[]) {
-    bool verbose{};
-    std::string file{};
-    CmdLine::BoolOpt(&verbose, "verbose");
-    CmdLine::StrPositional(&file);
-    CmdLine::SetUsage(usage);
-    int res = CmdLine::Parse(argc, argv);
+void VM::report(unsigned int line,
+                const std::string &pos,
+                const std::string_view reason) {
+    fmt::println("[Line {}] Error {}: {}", line, pos, reason);
+}
 
-    if (res != 0) {
-        fmt::println("Command line parse error");
-        return 1;
-    }
-
-    if (file.empty()) {
-        run_REPL();
+void VM::error(const Token &token, const std::string_view msg) {
+    if (token.type == token_type::END) {
+        report(token.line, "at end", msg);
     } else {
-        run_file(file);
+        report(token.line, "at `" + token.lexeme + "`", msg);
     }
 }

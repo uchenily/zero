@@ -18,6 +18,7 @@ private:
     public:
         using std::runtime_error::runtime_error;
     };
+    std::unique_ptr<Expr> expression();
     std::unique_ptr<Expr> equality();
     std::unique_ptr<Expr> comparison();
     std::unique_ptr<Expr> term();

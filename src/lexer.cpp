@@ -9,7 +9,7 @@ std::vector<Token> Lexer::scan_tokens() {
         scan_token();
     }
 
-    Token token(token_type::END, "", std::string(""));
+    Token token(token_type::END, "", std::string(""), line);
     tokens.push_back(token);
 
     return tokens;
@@ -101,7 +101,7 @@ void Lexer::add_token(token_type type) { add_token(type, std::string("")); }
 
 void Lexer::add_token(token_type type, const std::any &literal) {
     auto text = source.substr(start, current - start);
-    Token token(type, literal, text);
+    Token token(type, literal, text, line);
     tokens.push_back(token);
 }
 

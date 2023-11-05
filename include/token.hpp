@@ -52,8 +52,12 @@ enum class token_type {
 
 class Token {
 public:
-    Token(token_type type, std::any literal, std::string lexeme)
-        : type{type}, literal{std::move(literal)}, lexeme{std::move(lexeme)} {}
+    Token(token_type type,
+          std::any literal,
+          std::string lexeme,
+          unsigned int line)
+        : type{type}, literal{std::move(literal)}, lexeme{std::move(lexeme)},
+          line{line} {}
 
 public:
     std::string to_string() const;
@@ -62,5 +66,6 @@ public:
     const token_type type;
     const std::any literal;
     const std::string lexeme;
+    const unsigned int line;
 };
 } // namespace zero

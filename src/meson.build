@@ -2,6 +2,8 @@ source_files = files(
   'cmdline.cpp',
   'token.cpp',
   'lexer.cpp',
+  'parser.cpp',
+  'zero.cpp',
 )
 
 zero_lib = library('zero',
@@ -17,7 +19,7 @@ zero_dep = declare_dependency(
 
 dependencies += zero_dep
 
-executable('zero', 'zero.cpp',
+executable('zero', 'main.cpp',
   include_directories: includes,
   cpp_args: compile_args,
   install: true,
