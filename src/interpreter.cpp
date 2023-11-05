@@ -1,5 +1,6 @@
 #include "interpreter.hpp"
 
+#include "assert.hpp"
 #include "fmt/core.h"
 #include "zero.hpp"
 
@@ -24,6 +25,9 @@ void Interpreter::execute(const std::unique_ptr<Stmt> &stmt) {
 
 void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
                                 std::unique_ptr<Environment> env) {
+    expect(this->environment != nullptr);
+    expect(env != nullptr);
+    // 保存Env
     std::unique_ptr<Environment> previous = std::move(this->environment);
     try {
         this->environment = std::move(env);
@@ -36,7 +40,11 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
         throw;
     }
 
+    // 恢复Env
+    env = std::move(this->environment);
     this->environment = std::move(previous);
+    expect(this->environment != nullptr);
+    expect(env != nullptr);
 }
 
 std::any Interpreter::visit_binary_expr(Binary *expr) {
@@ -118,8 +126,8 @@ std::any Interpreter::visit_assign_expr(Assign *expr) {
 }
 
 std::any Interpreter::visit_block_stmt(Block *stmt) {
-    execute_block(stmt->statements,
-                  std::make_unique<Environment>(std::move(environment)));
+    // 进入block, 创建一个新的environment
+    execute_block(stmt->statements, std::make_unique<Environment>());
 
     return {};
 }

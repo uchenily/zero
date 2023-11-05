@@ -1,0 +1,36 @@
+// 表达式语句
+1 + 2;
+
+// print语句
+print("hello");
+
+// 块语句
+{
+    print("in block");
+    let b = 2;
+    print(b * 2);
+}
+
+// 变量定义语句
+let a = 1;
+
+// 打印表达式
+print(1 + 1);
+
+// 打印表达式
+print(a + a);
+
+// 嵌套块
+{
+    print("> enter block level 1");
+    let same_name = 100;
+    print(same_name);
+    {
+        print(">> enter block level 2");
+        let same_name = 200;
+        print(same_name);
+        print("<< exit block level 2");
+    }
+    print(same_name);
+    print("< exit block level 1");
+}
