@@ -31,6 +31,7 @@ void VM::run(std::string source) {
     }
 
     // 解释器
+    // TODO: 暂时是每一次执行都新创建一个解释器, 在REPL模式下不能利用上下文
     Interpreter interpreter{};
     interpreter.interpret(statements);
 
