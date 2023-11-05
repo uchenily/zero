@@ -4,10 +4,11 @@
 #include "zero.hpp"
 
 namespace zero {
-void Interpreter::interpret(const std::unique_ptr<Expr> &expr) {
+void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>> &stmts) {
     try {
-        std::any value = evaluate(expr);
-        fmt::println("{}", stringify(value));
+        for (const auto &stmt : stmts) {
+            execute(stmt);
+        }
     } catch (const RuntimeError &err) {
         VM::runtime_error(err);
     }
@@ -15,6 +16,10 @@ void Interpreter::interpret(const std::unique_ptr<Expr> &expr) {
 
 std::any Interpreter::evaluate(const std::unique_ptr<Expr> &expr) {
     return expr->accept(*this);
+}
+
+void Interpreter::execute(const std::unique_ptr<Stmt> &stmt) {
+    stmt->accept(*this);
 }
 
 std::any Interpreter::visit_binary_expr(Binary *expr) {
