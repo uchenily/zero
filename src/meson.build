@@ -4,6 +4,7 @@ source_files = files(
   'lexer.cpp',
   'parser.cpp',
   'interpreter.cpp',
+  'environment.cpp',
   'zero.cpp',
 )
 

@@ -1,6 +1,24 @@
 #pragma once
 
-namespace zero {
+#include "token.hpp"
 
-class Environment {};
+#include <any>
+#include <map>
+#include <memory>
+
+namespace zero {
+class Environment {
+
+public:
+    Environment() : enclosing(nullptr){};
+    explicit Environment(std::unique_ptr<Environment> enclosing)
+        : enclosing(std::move(enclosing)){};
+    std::any get(const Token &name);
+    void assign(const Token &name, std::any value);
+    void define(const std::string &name, std::any value);
+
+private:
+    std::unique_ptr<Environment> enclosing;
+    std::map<std::string, std::any> values;
+};
 } // namespace zero
