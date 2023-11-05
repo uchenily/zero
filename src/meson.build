@@ -3,6 +3,7 @@ source_files = files(
   'token.cpp',
   'lexer.cpp',
   'parser.cpp',
+  'interpreter.cpp',
   'zero.cpp',
 )
 

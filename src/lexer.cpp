@@ -150,14 +150,14 @@ void Lexer::parse_number() {
         advance();
     }
 
-    if (peek() == '.' && is_digit(peek_next())) {
-        advance();
-        while (is_digit(peek())) {
-            advance();
-        }
-    }
+    // if (peek() == '.' && is_digit(peek_next())) {
+    //     advance();
+    //     while (is_digit(peek())) {
+    //         advance();
+    //     }
+    // }
 
-    auto number = std::stod(source.substr(start, current - start));
+    auto number = std::stoi(source.substr(start, current - start));
     add_token(token_type::NUMBER, number);
 }
 
