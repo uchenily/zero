@@ -19,6 +19,7 @@ public:
     std::any visit_binary_expr(Binary *expr) override;
     std::any visit_grouping_expr(Grouping *expr) override;
     std::any visit_literal_expr(Literal *expr) override;
+    std::any visit_logical_expr(Logical *expr) override;
     std::any visit_unary_expr(Unary *expr) override;
     std::any visit_variable_expr(Variable *expr) override;
     std::any visit_assign_expr(Assign *expr) override;
@@ -28,6 +29,8 @@ public:
     std::any visit_expression_stmt(Expression *stmt) override;
     std::any visit_print_stmt(Print *stmt) override;
     std::any visit_var_stmt(Var *stmt) override;
+    std::any visit_if_stmt(If *stmt) override;
+    std::any visit_while_stmt(While *stmt) override;
 
 private:
     // 表达式求值

@@ -10,6 +10,8 @@ struct Block;
 struct Expression;
 struct Print;
 struct Var;
+struct If;
+struct While;
 
 using namespace zero;
 class StmtVisitor {
@@ -18,6 +20,8 @@ public:
     virtual std::any visit_expression_stmt(Expression *stmt) = 0;
     virtual std::any visit_print_stmt(Print *stmt) = 0;
     virtual std::any visit_var_stmt(Var *stmt) = 0;
+    virtual std::any visit_if_stmt(If *stmt) = 0;
+    virtual std::any visit_while_stmt(While *stmt) = 0;
     virtual ~StmtVisitor() = default;
 };
 
@@ -69,4 +73,32 @@ struct Var : Stmt {
 
     const Token name;
     const std::unique_ptr<Expr> initializer;
+};
+
+struct If : Stmt {
+    If(std::unique_ptr<Expr> condition,
+       std::unique_ptr<Stmt> then_branch,
+       std::unique_ptr<Stmt> else_branch)
+        : condition(std::move(condition)), then_branch(std::move(then_branch)),
+          else_branch(std::move(else_branch)){};
+
+    std::any accept(StmtVisitor &visitor) override {
+        return visitor.visit_if_stmt(this);
+    }
+
+    const std::unique_ptr<Expr> condition;
+    const std::unique_ptr<Stmt> then_branch;
+    const std::unique_ptr<Stmt> else_branch;
+};
+
+struct While : Stmt {
+    While(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body)
+        : condition(std::move(condition)), body(std::move(body)){};
+
+    std::any accept(StmtVisitor &visitor) override {
+        return visitor.visit_while_stmt(this);
+    }
+
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> body;
 };

@@ -9,6 +9,7 @@ namespace zero {
 struct Binary;
 struct Grouping;
 struct Literal;
+struct Logical;
 struct Unary;
 struct Variable;
 struct Assign;
@@ -17,6 +18,7 @@ struct ExprVisitor {
     virtual std::any visit_binary_expr(Binary *expr) = 0;
     virtual std::any visit_grouping_expr(Grouping *expr) = 0;
     virtual std::any visit_literal_expr(Literal *expr) = 0;
+    virtual std::any visit_logical_expr(Logical *expr) = 0;
     virtual std::any visit_unary_expr(Unary *expr) = 0;
     virtual std::any visit_variable_expr(Variable *expr) = 0;
     virtual std::any visit_assign_expr(Assign *expr) = 0;
@@ -57,6 +59,19 @@ struct Literal : Expr {
     }
 
     const std::any value;
+};
+
+struct Logical : Expr {
+    Logical(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right)
+        : left(std::move(left)), op(std::move(op)), right(std::move(right)){};
+
+    std::any accept(ExprVisitor &visitor) override {
+        return visitor.visit_logical_expr(this);
+    }
+
+    const std::unique_ptr<Expr> left;
+    const Token op;
+    const std::unique_ptr<Expr> right;
 };
 
 struct Unary : Expr {
