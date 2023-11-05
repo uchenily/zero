@@ -100,7 +100,7 @@ std::unique_ptr<Expr> Parser::primary() {
         return std::make_unique<Grouping>(std::move(expr));
     }
 
-    throw error(peek(), "Expect expression.");
+    throw ParseError(peek(), "Expect expression.");
 }
 
 template <class... T>
@@ -120,7 +120,7 @@ Token Parser::consume(token_type type, const std::string_view msg) {
         return advance();
     }
 
-    throw error(peek(), msg);
+    throw ParseError(peek(), msg);
 }
 
 bool Parser::check(token_type type) {
@@ -144,10 +144,6 @@ bool Parser::is_at_end() { return peek().type == token_type::END; }
 Token Parser::peek() { return tokens.at(current); }
 
 Token Parser::previous() { return tokens.at(current - 1); }
-
-Parser::ParseError Parser::error(const Token &token, std::string_view msg) {
-    VM::error(token, msg);
-}
 
 void Parser::synchronize() {
     advance();

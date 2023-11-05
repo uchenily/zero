@@ -14,7 +14,12 @@ public:
     std::unique_ptr<Expr> parse();
 
 private:
-    class ParseError : public std::runtime_error {};
+    struct ParseError : public std::runtime_error {
+        ParseError(const Token &token, std::string_view msg)
+            : std::runtime_error{msg.data()}, token{token} {}
+
+        const Token &token;
+    };
     std::unique_ptr<Expr> expression();
     std::unique_ptr<Expr> equality();
     std::unique_ptr<Expr> comparison();
@@ -30,7 +35,6 @@ private:
     Token previous();
     bool is_at_end();
     bool check(token_type type);
-    ParseError error(const Token &token, std::string_view msg);
     void synchronize();
 
     const std::vector<Token> &tokens;
