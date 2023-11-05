@@ -1,4 +1,5 @@
 #pragma once
+#include "environment.hpp"
 #include "expr.hpp"
 #include "stmt.hpp"
 
@@ -12,6 +13,7 @@ struct RuntimeError : public std::runtime_error {
 
 class Interpreter : public ExprVisitor, public StmtVisitor {
 public:
+    Interpreter() : environment{std::make_unique<Environment>()} {}
     void interpret(const std::vector<std::unique_ptr<Stmt>> &stmts);
     // Expr抽象类方法
     std::any visit_binary_expr(Binary *expr) override;
@@ -32,6 +34,8 @@ private:
     std::any evaluate(const std::unique_ptr<Expr> &expr);
     // 执行语句
     void execute(const std::unique_ptr<Stmt> &stmt);
+    void execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
+                       std::unique_ptr<Environment> env);
 
     static void check_number_operand(const Token &op, const std::any &operand);
     static void check_number_operands(const Token &op,
@@ -40,5 +44,8 @@ private:
     static bool is_truthy(const std::any &object);
     static bool is_equal(const std::any &a, const std::any &b);
     static std::string stringify(const std::any &object);
+
+private:
+    std::unique_ptr<Environment> environment;
 };
 } // namespace zero

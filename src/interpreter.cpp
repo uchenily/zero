@@ -22,6 +22,23 @@ void Interpreter::execute(const std::unique_ptr<Stmt> &stmt) {
     stmt->accept(*this);
 }
 
+void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
+                                std::unique_ptr<Environment> env) {
+    std::unique_ptr<Environment> previous = std::move(this->environment);
+    try {
+        this->environment = std::move(env);
+
+        for (const auto &stmt : stmts) {
+            execute(stmt);
+        }
+    } catch (...) {
+        this->environment = std::move(previous);
+        throw;
+    }
+
+    this->environment = std::move(previous);
+}
+
 std::any Interpreter::visit_binary_expr(Binary *expr) {
     std::any left = evaluate(expr->left);
     std::any right = evaluate(expr->right);
