@@ -40,12 +40,28 @@ void VM::run(std::string source) {
     }
 }
 
-void VM::run_file(const std::string &file) {
-    std::fstream source(file, std::ios::in | std::ios::binary);
+static bool file_exists(const std::string &file_path) {
+    std::fstream file(file_path);
+    return file.good();
+}
+
+static std::string read_file(const std::string &file_path) {
+    std::fstream file(file_path, std::ios::in | std::ios::binary);
     std::stringstream buf;
 
-    buf << source.rdbuf();
-    run(buf.str());
+    buf << file.rdbuf();
+
+    return buf.str();
+}
+
+void VM::run_file(const std::string &file_path) {
+    if (!file_exists(file_path)) {
+        fmt::println("File `{}` not exist", file_path);
+        return;
+    }
+
+    auto source = read_file(file_path);
+    run(source);
 }
 
 static void signal_handler(int signal) {
