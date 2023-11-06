@@ -65,6 +65,7 @@ private:
     bool m_required;
 };
 
+// position arguments列表, 安装前端设置的先后顺序处理
 static std::vector<Opt> g_positional;
 
 void StrOptRequired(std::string *value, std::string name) {
