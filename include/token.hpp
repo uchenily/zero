@@ -64,8 +64,8 @@ public:
 
 public:
     const token_type type;
-    const std::any literal;
-    const std::string lexeme;
+    const std::any literal; // 字面量, 字符串/数字/true/...
+    const std::string lexeme; // 词位
     const unsigned int line;
 };
 } // namespace zero
