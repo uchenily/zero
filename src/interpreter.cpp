@@ -46,7 +46,7 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
     // this->environment = std::move(previous);
     // expect(this->environment != nullptr);
     // expect(env != nullptr);
-    // 出block前, 将之前的env恢复
+    // 出block前, 将之前的env恢复 (按照出栈来理解)
     this->environment = this->environment->get_enclosing();
 }
 
@@ -151,7 +151,7 @@ std::any Interpreter::visit_assign_expr(Assign *expr) {
 std::any Interpreter::visit_block_stmt(Block *stmt) {
     // 进入block, 创建一个新的environment
     // execute_block(stmt->statements, std::make_unique<Environment>());
-    // 进入block前, 创建一个新的env, 需要包含当前env
+    // 进入block前, 创建一个新的env, 需要包含当前env (按照入栈理解)
     execute_block(stmt->statements,
                   std::make_unique<Environment>(std::move(environment)));
 
