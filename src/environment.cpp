@@ -14,7 +14,7 @@ std::any Environment::get(const Token &name) {
     }
 
     throw RuntimeError(name,
-                       std::string("Undefined variable '" + name.lexeme + "'"));
+                       std::string("Undefined variable `" + name.lexeme + "`"));
 }
 
 void Environment::assign(const Token &name, std::any value) {
@@ -30,7 +30,7 @@ void Environment::assign(const Token &name, std::any value) {
     }
 
     throw RuntimeError(name,
-                       std::string("Undefined variable '" + name.lexeme + "'"));
+                       std::string("Undefined variable `" + name.lexeme + "`"));
 }
 
 void Environment::define(const std::string &name, std::any value) {
