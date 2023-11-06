@@ -27,6 +27,7 @@ private:
     char peek_next();
     void identifier();
 
+private:
     std::vector<Token> tokens;
     unsigned int start = 0;
     unsigned int current = 0;
