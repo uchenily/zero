@@ -6,14 +6,16 @@
 #include <memory>
 #include <vector>
 
+namespace zero {
 struct Block;
 struct Expression;
 struct Print;
 struct Var;
 struct If;
 struct While;
+struct Function;
+struct Return;
 
-using namespace zero;
 class StmtVisitor {
 public:
     virtual std::any visit_block_stmt(Block *stmt) = 0;
@@ -22,6 +24,8 @@ public:
     virtual std::any visit_var_stmt(Var *stmt) = 0;
     virtual std::any visit_if_stmt(If *stmt) = 0;
     virtual std::any visit_while_stmt(While *stmt) = 0;
+    virtual std::any visit_function_stmt(Function *stmt) = 0;
+    virtual std::any visit_return_stmt(Return *stmt) = 0;
     virtual ~StmtVisitor() = default;
 };
 
@@ -102,3 +106,33 @@ struct While : Stmt {
     std::unique_ptr<Expr> condition;
     std::unique_ptr<Stmt> body;
 };
+
+struct Function : Stmt {
+    Function(Token name,
+             std::vector<Token> params,
+             std::vector<std::unique_ptr<Stmt>> body)
+        : name(std::move(name)), params(std::move(params)),
+          body(std::move(body)){};
+
+    std::any accept(StmtVisitor &visitor) override {
+        return visitor.visit_function_stmt(this);
+    }
+
+    const Token name;
+    const std::vector<Token> params;
+    const std::vector<std::unique_ptr<Stmt>> body;
+};
+
+struct Return : Stmt {
+    Return(Token keyword, std::unique_ptr<Expr> value)
+        : keyword(std::move(keyword)), value(std::move(value)){};
+
+    std::any accept(StmtVisitor &visitor) override {
+        return visitor.visit_return_stmt(this);
+    }
+
+    const Token keyword;
+    const std::unique_ptr<Expr> value;
+};
+
+} // namespace zero

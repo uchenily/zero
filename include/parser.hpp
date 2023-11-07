@@ -17,12 +17,13 @@ struct ParseError : public std::runtime_error {
     const Token token;
 };
 
-class Parser {  
+class Parser {
 public:
     explicit Parser(const std::vector<Token> &tokens) : tokens(tokens){};
-    std::vector<std::unique_ptr<Stmt>> parse();   
+    std::vector<std::unique_ptr<Stmt>> parse();
 
 private:
+    // 表达式
     std::unique_ptr<Expr> expression();
     std::unique_ptr<Expr> assignment();
     std::unique_ptr<Expr> equality();
@@ -31,7 +32,10 @@ private:
     std::unique_ptr<Expr> factor();
     std::unique_ptr<Expr> unary();
     std::unique_ptr<Expr> primary();
+    std::unique_ptr<Expr> call();
+    std::unique_ptr<Expr> finish_call(std::unique_ptr<Expr> callee);
 
+    // 语句
     std::unique_ptr<Stmt> declaration();
     std::unique_ptr<Stmt> statement();
     std::unique_ptr<Stmt> print_statement();
@@ -41,6 +45,10 @@ private:
     std::unique_ptr<Stmt> for_statement();
     std::unique_ptr<Stmt> while_statement();
     std::vector<std::unique_ptr<Stmt>> block();
+    std::unique_ptr<Stmt> return_statement();
+
+    // 函数
+    std::unique_ptr<Function> function();
 
     template <class... T>
     bool match(T... type);

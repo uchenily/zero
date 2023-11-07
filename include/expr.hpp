@@ -4,6 +4,7 @@
 
 #include <any>
 #include <memory>
+#include <vector>
 
 namespace zero {
 struct Binary;
@@ -13,6 +14,7 @@ struct Logical;
 struct Unary;
 struct Variable;
 struct Assign;
+struct Call;
 
 struct ExprVisitor {
     virtual std::any visit_binary_expr(Binary *expr) = 0;
@@ -22,6 +24,7 @@ struct ExprVisitor {
     virtual std::any visit_unary_expr(Unary *expr) = 0;
     virtual std::any visit_variable_expr(Variable *expr) = 0;
     virtual std::any visit_assign_expr(Assign *expr) = 0;
+    virtual std::any visit_call_expr(Call *expr) = 0;
     virtual ~ExprVisitor() = default;
 };
 
@@ -105,6 +108,19 @@ struct Assign : Expr {
 
     const Token name;
     const std::unique_ptr<Expr> value;
+};
+
+struct Call : Expr {
+    Call(std::unique_ptr<Expr> callee,
+         std::vector<std::unique_ptr<Expr>> arguments)
+        : callee{std::move(callee)}, arguments{std::move(arguments)} {};
+
+    std::any accept(ExprVisitor &visitor) override {
+        return visitor.visit_call_expr(this);
+    }
+
+    const std::unique_ptr<Expr> callee;
+    const std::vector<std::unique_ptr<Expr>> arguments;
 };
 
 } // namespace zero

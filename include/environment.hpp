@@ -15,11 +15,11 @@ public:
         : enclosing(std::move(enclosing)){};
 
 public:
-    // 获取一个环境变量        
+    // 获取一个环境变量
     std::any get(const Token &name);
     // 给环境变量赋值
     void assign(const Token &name, std::any value);
-    // 在当前环境定义一个变量
+    // 在当前环境定义一个变量/函数
     void define(const std::string &name, std::any value);
 
     // 外层环境

@@ -23,6 +23,7 @@ public:
     std::any visit_unary_expr(Unary *expr) override;
     std::any visit_variable_expr(Variable *expr) override;
     std::any visit_assign_expr(Assign *expr) override;
+    std::any visit_call_expr(Call *expr) override;
 
     // Stmt抽象类方法
     std::any visit_block_stmt(Block *stmt) override;
@@ -31,6 +32,8 @@ public:
     std::any visit_var_stmt(Var *stmt) override;
     std::any visit_if_stmt(If *stmt) override;
     std::any visit_while_stmt(While *stmt) override;
+    std::any visit_function_stmt(Function *stmt) override;
+    std::any visit_return_stmt(Return *stmt) override;
 
 private:
     // 表达式求值
