@@ -16,7 +16,13 @@ class Interpreter : public ExprVisitor, public StmtVisitor {
     friend ZeroFunction;
 
 public:
-    Interpreter() : environment{std::make_unique<Environment>()} {}
+    Interpreter() : environment{std::make_unique<Environment>()} {
+        // 初始化的时候, environment也就是globals环境
+        // 在函数调用进入时, environment会发生改变
+        // 在函数调用完成时, environment又恢复回来(globals环境)
+    }
+
+public:
     void interpret(const std::vector<std::unique_ptr<Stmt>> &stmts);
     // Expr抽象类方法
     std::any visit_binary_expr(Binary *expr) override;
@@ -55,6 +61,26 @@ private:
     static std::string stringify(const std::any &object);
 
 private:
-    std::unique_ptr<Environment> environment; // current environment
+    class EnviromentGuard {
+    public:
+        // This simulates "finally" keyword usage in executeBlock of Java
+        // version "execute" can throw "ReturnException" and we need to unwind
+        // the stack and return to previous enviroment on each scope exit
+        EnviromentGuard(Interpreter *interpreter,
+                        std::unique_ptr<Environment> new_env)
+            : interpreter{interpreter},
+              previous{std::move(interpreter->environment)} {
+            interpreter->environment = std::move(new_env);
+        }
+
+        ~EnviromentGuard() { interpreter->environment = std::move(previous); }
+
+    private:
+        Interpreter *interpreter;
+        std::unique_ptr<Environment> previous;
+    };
+
+private:
+    std::unique_ptr<Environment> environment; // 解释器当前环境
 };
 } // namespace zero

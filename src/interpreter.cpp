@@ -42,7 +42,9 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
     //    this->environment = this->environment->get_enclosing();
     //    throw;
     //}
-    EnviromentGuard guard{std::move(this->environment), std::move(env)};
+
+    // 在新环境中执行, 执行完后, 恢复之前的环境
+    EnviromentGuard guard{this, std::move(env)};
     for (const auto &stmt : stmts) {
         execute(stmt);
     }
@@ -157,8 +159,13 @@ std::any Interpreter::visit_assign_expr(Assign *expr) {
 std::any Interpreter::visit_call_expr(Call *expr) {
     std::any callee = evaluate(expr->callee);
     std::vector<std::any> arguments;
-    for (const auto &argument : expr->arguments) {
-        arguments.push_back(evaluate(argument));
+    // for (const auto &argument : expr->arguments) {
+    //     arguments.push_back(evaluate(argument));
+    // }
+    auto num_arguments = expr->arguments.size();
+    arguments.resize(num_arguments);
+    for (auto i = 0u; i < num_arguments; i++) {
+        arguments[i] = evaluate(expr->arguments[i]);
     }
 
     if (callee.type() == typeid(ZeroFunction)) {
@@ -224,7 +231,7 @@ std::any Interpreter::visit_while_stmt(While *stmt) {
 
 std::any Interpreter::visit_function_stmt(Function *stmt) {
     auto function = ZeroFunction(stmt, environment.get());
-    // NOTE: 转std::any需要这个类似有拷贝构造函数
+    // NOTE: 转std::any需要这个类型有拷贝构造函数
     environment->define(stmt->name.lexeme, function);
 
     return {};

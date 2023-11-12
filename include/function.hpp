@@ -18,6 +18,7 @@ public:
     virtual std::any call(Interpreter &interpreter,
                           std::vector<std::any> arguments)
         = 0;
+    // 基类析构函数定义成虚函数
     virtual std::string to_string() = 0;
 };
 

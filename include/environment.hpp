@@ -29,22 +29,4 @@ private:
     std::map<std::string, std::any> values; // 根据token的词位信息存储变量值
 };
 
-class EnviromentGuard {
-public:
-    // This simulates "finally" keyword usage in executeBlock of Java version
-    // "execute" can throw "ReturnException" and we need to unwind the stack
-    // and return to previous enviroment on each scope exit
-    EnviromentGuard(std::unique_ptr<Environment> current,
-                    std::unique_ptr<Environment> env)
-        : previous{std::move(current)} {
-        current = std::move(env);
-    } // namespace zero
-
-    ~EnviromentGuard() { current = std::move(previous); }
-
-private:
-    std::unique_ptr<Environment> current;
-    std::unique_ptr<Environment> previous;
-};
-
 } // namespace zero

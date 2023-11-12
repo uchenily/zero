@@ -12,9 +12,12 @@ std::string ZeroFunction::to_string() {
 
 std::any ZeroFunction::call(Interpreter &interpreter,
                             std::vector<std::any> arguments) {
-    auto env = std::make_unique<Environment>(closure);
-    for (size_t i = 0; i < declaration->params.size(); i++) {
-        env->define(declaration->params[i].lexeme, arguments[i]);
+    // auto env = std::make_unique<Environment>(closure);
+    // 创建一个新的环境, 包含全局环境
+    auto env = std::make_unique<Environment>(interpreter.environment.get());
+    for (auto i = 0u; i < declaration->params.size(); i++) {
+        env->define(declaration->params[i].lexeme,
+                    arguments[i]); // "a": 1, "b": 2
     }
 
     try {
@@ -23,7 +26,7 @@ std::any ZeroFunction::call(Interpreter &interpreter,
         return returnValue.value;
     }
 
-    return nullptr;
+    return {};
 }
 
 } // namespace zero
