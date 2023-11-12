@@ -1,12 +1,8 @@
 name: CI
 
-on:
-  push:
-    branches: [ $default-branch ]
-  pull_request:
-    branches: [ $default-branch ]
+on: [push, pull_request]
 
-  workflow_dispatch:
+  # workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -17,11 +13,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+    #  - name: Install fmt
+    #    uses: maximeverreault/setup-fmt@v1.0.0
+    #    id: install_fmt
+    #    with:
+    #      version: 9.1.0
+    #      directory: /usr/local
+    #    env:
+    #      GH_TOKEN: ${{ github.token }}
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install meson ninja
-          sudo apt-get install libfmt-dev
+          mkdir subprojects
+          meson wrap install fmt
 
       - name: Configure
         run: meson setup --reconfigure build
@@ -36,6 +42,4 @@ jobs:
         run: make tests
 
       - name: Run examples
-        run: |
-          meson install -C build
-          make examples
+        run: make examples
