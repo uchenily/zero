@@ -11,8 +11,7 @@ class Environment {
 
 public:
     Environment() = default;
-    explicit Environment(std::unique_ptr<Environment> enclosing)
-        : enclosing(std::move(enclosing)){};
+    explicit Environment(Environment *enclosing) : enclosing{enclosing} {};
 
 public:
     // 获取一个环境变量
@@ -23,12 +22,29 @@ public:
     void define(const std::string &name, std::any value);
 
     // 外层环境
-    std::unique_ptr<Environment> get_enclosing() {
-        return std::move(this->enclosing);
-    }
+    Environment *get_enclosing() { return this->enclosing; }
 
 private:
-    std::unique_ptr<Environment> enclosing{}; // 外层的封闭环境
+    Environment *enclosing{};               // 外层的封闭环境
     std::map<std::string, std::any> values; // 根据token的词位信息存储变量值
 };
+
+class EnviromentGuard {
+public:
+    // This simulates "finally" keyword usage in executeBlock of Java version
+    // "execute" can throw "ReturnException" and we need to unwind the stack
+    // and return to previous enviroment on each scope exit
+    EnviromentGuard(std::unique_ptr<Environment> current,
+                    std::unique_ptr<Environment> env)
+        : previous{std::move(current)} {
+        current = std::move(env);
+    } // namespace zero
+
+    ~EnviromentGuard() { current = std::move(previous); }
+
+private:
+    std::unique_ptr<Environment> current;
+    std::unique_ptr<Environment> previous;
+};
+
 } // namespace zero
