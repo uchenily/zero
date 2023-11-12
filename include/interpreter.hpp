@@ -16,7 +16,9 @@ class Interpreter : public ExprVisitor, public StmtVisitor {
     friend ZeroFunction;
 
 public:
-    Interpreter() : environment{std::make_unique<Environment>()} {
+    Interpreter()
+        : environment{std::make_unique<Environment>()},
+          globals{environment.get()} {
         // 初始化的时候, environment也就是globals环境
         // 在函数调用进入时, environment会发生改变
         // 在函数调用完成时, environment又恢复回来(globals环境)
@@ -60,6 +62,9 @@ private:
     static bool is_equal(const std::any &a, const std::any &b);
     static std::string stringify(const std::any &object);
 
+    // helper function
+    Environment *get_globals() { return globals; }
+
 private:
     class EnviromentGuard {
     public:
@@ -70,9 +75,11 @@ private:
                         std::unique_ptr<Environment> new_env)
             : interpreter{interpreter},
               previous{std::move(interpreter->environment)} {
+            // 设置新环境
             interpreter->environment = std::move(new_env);
         }
 
+        // 恢复原环境
         ~EnviromentGuard() { interpreter->environment = std::move(previous); }
 
     private:
@@ -82,5 +89,6 @@ private:
 
 private:
     std::unique_ptr<Environment> environment; // 解释器当前环境
+    Environment *const globals; // 解释器global环境, 初始化后指针不再改变
 };
 } // namespace zero

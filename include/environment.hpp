@@ -21,12 +21,11 @@ public:
     // 在当前环境定义一个变量/函数
     void define(const std::string &name, std::any value);
 
-    // 外层环境
-    Environment *get_enclosing() { return this->enclosing; }
-
 private:
     Environment *enclosing{};               // 外层的封闭环境
     std::map<std::string, std::any> values; // 根据token的词位信息存储变量值
+    // 例如, fn add(a, b) {...}; add(1, 2);
+    // values中会存放键值对 "a": 1, "b": 2
 };
 
 } // namespace zero
