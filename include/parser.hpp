@@ -26,6 +26,8 @@ private:
     // 表达式
     std::unique_ptr<Expr> expression();
     std::unique_ptr<Expr> assignment();
+    std::unique_ptr<Expr> or_expression();
+    std::unique_ptr<Expr> and_expression();
     std::unique_ptr<Expr> equality();
     std::unique_ptr<Expr> comparison();
     std::unique_ptr<Expr> term();
@@ -48,7 +50,7 @@ private:
     std::unique_ptr<Stmt> return_statement();
 
     // 函数
-    std::unique_ptr<Function> function();
+    std::unique_ptr<Function> func_declaration();
 
     template <class... T>
     bool match(T... type);

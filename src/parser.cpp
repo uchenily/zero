@@ -8,6 +8,7 @@
 namespace zero {
 
 std::vector<std::unique_ptr<Stmt>> Parser::parse() {
+    // program -> declaration* END
     std::vector<std::unique_ptr<Stmt>> statements;
     try {
         while (!is_at_end()) {
@@ -20,15 +21,19 @@ std::vector<std::unique_ptr<Stmt>> Parser::parse() {
     return statements;
 }
 
-std::unique_ptr<Expr> Parser::expression() { return assignment(); }
+std::unique_ptr<Expr> Parser::expression() {
+    // expression -> assignment
+    return assignment();
+}
 
 std::unique_ptr<Stmt> Parser::declaration() {
+    // declaration -> var_declaration | func_declaration | statement
     // try {
     if (match(token_type::LET)) {
         return var_declaration();
     }
     if (match(token_type::FN)) {
-        return function();
+        return func_declaration();
     }
 
     return statement();
@@ -40,6 +45,8 @@ std::unique_ptr<Stmt> Parser::declaration() {
 }
 
 std::unique_ptr<Stmt> Parser::statement() {
+    // statement -> if_stmt | for_stmt | while_stmt | print_stmt | block |
+    // return_stmt | expr_stmt
     if (match(token_type::IF)) {
         return if_statement();
     }
@@ -63,6 +70,9 @@ std::unique_ptr<Stmt> Parser::statement() {
 }
 
 std::unique_ptr<Stmt> Parser::for_statement() {
+    // for_stmt -> "for" "(" ( var_decl | expr_stmt | ";" )
+    //             expression? ";"
+    //             expression? ")" stmt
     consume(token_type::LEFT_PAREN, "Expect '(' after for");
 
     std::unique_ptr<Stmt> initializer;
@@ -111,6 +121,7 @@ std::unique_ptr<Stmt> Parser::for_statement() {
 }
 
 std::unique_ptr<Stmt> Parser::if_statement() {
+    // if_stmt -> "if" "(" expression ")" statement ( "else" statement )?
     consume(token_type::LEFT_PAREN, "Expect '(' after if.");
     std::unique_ptr<Expr> cond = expression();
     consume(token_type::RIGHT_PAREN, "Expect ')' after if condition.");
@@ -126,6 +137,7 @@ std::unique_ptr<Stmt> Parser::if_statement() {
 }
 
 std::unique_ptr<Stmt> Parser::while_statement() {
+    // while_stmt -> "while" "(" expression ")" statement
     consume(token_type::LEFT_PAREN, "Expect '(' after while.");
     std::unique_ptr<Expr> cond = expression();
     consume(token_type::RIGHT_PAREN, "Expect ')' after condition.");
@@ -135,6 +147,7 @@ std::unique_ptr<Stmt> Parser::while_statement() {
 }
 
 std::unique_ptr<Stmt> Parser::print_statement() {
+    // print_stmt -> "print" expression ";"
     auto value = expression();
     consume(token_type::SEMICOLON, "Expect ';' after value.");
 
@@ -142,6 +155,7 @@ std::unique_ptr<Stmt> Parser::print_statement() {
 }
 
 std::unique_ptr<Stmt> Parser::var_declaration() {
+    // var_declaration -> "let" IDENTIFIER ("=" expression)? ";"
     Token name = consume(token_type::IDENTIFIER, "Expect variable name.");
     std::unique_ptr<Expr> initializer = nullptr;
 
@@ -155,6 +169,7 @@ std::unique_ptr<Stmt> Parser::var_declaration() {
 }
 
 std::unique_ptr<Stmt> Parser::expr_statement() {
+    // expr_stmt -> expression ";"
     auto expr = expression();
     consume(token_type::SEMICOLON, "Expect ';' after expression.");
 
@@ -162,6 +177,7 @@ std::unique_ptr<Stmt> Parser::expr_statement() {
 }
 
 std::vector<std::unique_ptr<Stmt>> Parser::block() {
+    // block -> "{" declaration* "}"
     std::vector<std::unique_ptr<Stmt>> statements;
 
     while (!check(token_type::RIGHT_BRACE) && !is_at_end()) {
@@ -174,6 +190,7 @@ std::vector<std::unique_ptr<Stmt>> Parser::block() {
 }
 
 std::unique_ptr<Stmt> Parser::return_statement() {
+    // return_stmt -> "return" expression? ";"
     Token keyword = previous();
     std::unique_ptr<Expr> value = nullptr;
     if (!check(token_type::SEMICOLON)) {
@@ -185,7 +202,8 @@ std::unique_ptr<Stmt> Parser::return_statement() {
 }
 
 std::unique_ptr<Expr> Parser::assignment() {
-    auto expr = equality();
+    // assignment -> IDENTIFIER "=" assignment | logic_or
+    auto expr = or_expression();
 
     if (match(token_type::EQUAL)) {
         Token equals = previous();
@@ -202,7 +220,34 @@ std::unique_ptr<Expr> Parser::assignment() {
     return expr;
 }
 
+std::unique_ptr<Expr> Parser::or_expression() {
+    // logic_or -> logic_and ( "or" logic_and )*
+    auto expr = and_expression();
+
+    while (match(token_type::OR)) {
+        auto op = previous();
+        auto right = and_expression();
+        expr = std::make_unique<Logical>(std::move(expr), op, std::move(right));
+    }
+
+    return expr;
+}
+
+std::unique_ptr<Expr> Parser::and_expression() {
+    // logic_and -> equality ( "and" equality )*
+    auto expr = equality();
+
+    while (match(token_type::AND)) {
+        auto op = previous();
+        auto right = equality();
+        expr = std::make_unique<Logical>(std::move(expr), op, std::move(right));
+    }
+
+    return expr;
+}
+
 std::unique_ptr<Expr> Parser::equality() {
+    // equality -> comparison ( ( "!=" | "==" ) comparison )*
     auto expr = comparison();
 
     while (match(token_type::NOT_EQUAL, token_type::EQUAL_EQUAL)) {
@@ -216,6 +261,7 @@ std::unique_ptr<Expr> Parser::equality() {
 }
 
 std::unique_ptr<Expr> Parser::comparison() {
+    // comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
     auto expr = term();
 
     while (match(token_type::GREATER,
@@ -232,6 +278,7 @@ std::unique_ptr<Expr> Parser::comparison() {
 }
 
 std::unique_ptr<Expr> Parser::term() {
+    // term -> factor ( ( "-" | "+" ) factor )*
     auto expr = factor();
 
     while (match(token_type::MINUS, token_type::PLUS)) {
@@ -245,6 +292,7 @@ std::unique_ptr<Expr> Parser::term() {
 }
 
 std::unique_ptr<Expr> Parser::factor() {
+    // factor -> unary ( ( "/" | "*" ) unary )*
     auto expr = unary();
 
     while (match(token_type::SLASH, token_type::STAR)) {
@@ -258,41 +306,18 @@ std::unique_ptr<Expr> Parser::factor() {
 }
 
 std::unique_ptr<Expr> Parser::unary() {
+    // unary -> ( "!" | "-" ) unary | call
     if (match(token_type::NOT, token_type::MINUS)) {
         Token op = previous();
         auto right = unary();
         return std::make_unique<Unary>(std::move(op), std::move(right));
     }
 
-    return primary();
-}
-
-std::unique_ptr<Expr> Parser::primary() {
-    if (match(token_type::FALSE)) {
-        return std::make_unique<Literal>(false);
-    }
-    if (match(token_type::TRUE)) {
-        return std::make_unique<Literal>(true);
-    }
-    if (match(token_type::NIL)) {
-        return std::make_unique<Literal>(nullptr);
-    }
-    if (match(token_type::NUMBER, token_type::STRING)) {
-        return std::make_unique<Literal>(previous().literal);
-    }
-    if (match(token_type::IDENTIFIER)) {
-        return std::make_unique<Variable>(previous());
-    }
-    if (match(token_type::LEFT_PAREN)) {
-        std::unique_ptr<Expr> expr = expression();
-        consume(token_type::RIGHT_PAREN, "Expect ')' after expression.");
-        return std::make_unique<Grouping>(std::move(expr));
-    }
-
-    throw ParseError(peek(), "Expect expression.");
+    return call();
 }
 
 std::unique_ptr<Expr> Parser::call() {
+    // call -> primary ( "(" arguments? ")" )*
     std::unique_ptr<Expr> expr = primary();
     while (true) {
         if (match(token_type::LEFT_PAREN)) {
@@ -320,7 +345,35 @@ std::unique_ptr<Expr> Parser::finish_call(std::unique_ptr<Expr> callee) {
     return std::make_unique<Call>(std::move(callee), std::move(arguments));
 }
 
-std::unique_ptr<Function> Parser::function() {
+std::unique_ptr<Expr> Parser::primary() {
+    // primary -> NUMBER | STRING | "false" | "true" | "nil" | IDENTIFIER | "("
+    // expression ")"
+    if (match(token_type::FALSE)) {
+        return std::make_unique<Literal>(false);
+    }
+    if (match(token_type::TRUE)) {
+        return std::make_unique<Literal>(true);
+    }
+    if (match(token_type::NIL)) {
+        return std::make_unique<Literal>(nullptr);
+    }
+    if (match(token_type::NUMBER, token_type::STRING)) {
+        return std::make_unique<Literal>(previous().literal);
+    }
+    if (match(token_type::IDENTIFIER)) {
+        return std::make_unique<Variable>(previous());
+    }
+    if (match(token_type::LEFT_PAREN)) {
+        std::unique_ptr<Expr> expr = expression();
+        consume(token_type::RIGHT_PAREN, "Expect ')' after expression.");
+        return std::make_unique<Grouping>(std::move(expr));
+    }
+
+    throw ParseError(peek(), "Expect expression.");
+}
+
+std::unique_ptr<Function> Parser::func_declaration() {
+    // function -> "fn" IDENTIFIER "(" parameters? ")" block
     Token name = consume(token_type::IDENTIFIER, "Expect function name.");
     consume(token_type::LEFT_PAREN, "Expection `(` after function name.");
     std::vector<Token> parameters;
