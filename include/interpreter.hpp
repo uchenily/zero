@@ -22,6 +22,7 @@ public:
         // 初始化的时候, environment也就是globals环境
         // 在函数调用进入时, environment会发生改变
         // 在函数调用完成时, environment又恢复回来(globals环境)
+        register_functions();
     }
 
 public:
@@ -64,6 +65,7 @@ private:
 
     // helper function
     Environment *get_globals() { return globals; }
+    void register_functions();
 
 private:
     class EnviromentGuard {

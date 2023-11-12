@@ -1,0 +1,8 @@
+print(clock);
+
+let retval = clock();
+print(retval);
+
+let retval = read_file("/foo/bar");
+print("读取到文件内容:");
+print(retval);

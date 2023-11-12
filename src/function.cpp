@@ -28,4 +28,10 @@ std::any ZeroFunction::call(Interpreter &interpreter,
     return {};
 }
 
+std::string NativeFunction::to_string() { return "<native fn>"; }
+std::any NativeFunction::call([[maybe_unused]] Interpreter &interpreter,
+                              std::vector<std::any> arguments) {
+    return native_func(arguments);
+}
+
 } // namespace zero

@@ -6,6 +6,9 @@
 #include "token.hpp"
 #include "zero.hpp"
 
+#include <any>
+#include <ctime>
+
 namespace zero {
 void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>> &stmts) {
     try {
@@ -172,6 +175,11 @@ std::any Interpreter::visit_call_expr(Call *expr) {
         auto function = std::any_cast<ZeroFunction>(callee);
         return function.call(*this, std::move(arguments));
     }
+
+    if (callee.type() == typeid(NativeFunction)) {
+        auto function = std::any_cast<NativeFunction>(callee);
+        return function.call(*this, std::move(arguments));
+    }
     // TODO
     throw RuntimeError(Token{token_type::FN, {}, "fn", 0},
                        "Can only call functions and classes.");
@@ -230,7 +238,7 @@ std::any Interpreter::visit_while_stmt(While *stmt) {
 }
 
 std::any Interpreter::visit_function_stmt(Function *stmt) {
-    auto function = ZeroFunction(stmt, environment.get());
+    auto function = ZeroFunction(stmt);
     // NOTE: 转std::any需要这个类型有拷贝构造函数
     environment->define(stmt->name.lexeme, function);
 
@@ -309,6 +317,10 @@ std::string Interpreter::stringify(const std::any &object) {
 
         return text;
     }
+    if (object.type() == typeid(double)) {
+        auto num = std::any_cast<double>(object);
+        return std::to_string(num);
+    }
 
     if (object.type() == typeid(std::string)) {
         return std::any_cast<std::string>(object);
@@ -319,7 +331,30 @@ std::string Interpreter::stringify(const std::any &object) {
     if (object.type() == typeid(ZeroFunction)) {
         return std::any_cast<ZeroFunction>(object).to_string();
     }
+    if (object.type() == typeid(NativeFunction)) {
+        return std::any_cast<NativeFunction>(object).to_string();
+    }
 
     return "Error in 'stringify': object type not supported.";
+}
+
+// ---------------------------------------
+//            Native functions
+// ---------------------------------------
+std::any clock([[maybe_unused]] const std::vector<std::any> &arguments) {
+    std::time_t t = std::time(nullptr);
+    return static_cast<double>(t);
+}
+
+std::any read_file(const std::vector<std::any> &arguments) {
+    auto file_path = std::any_cast<std::string>(arguments[0]);
+    fmt::println("reading {} ...", file_path);
+    // fake
+    return std::string("example text");
+}
+
+void Interpreter::register_functions() {
+    get_globals()->define("clock", NativeFunction{clock});
+    get_globals()->define("read_file", NativeFunction{read_file});
 }
 } // namespace zero
