@@ -6,3 +6,4 @@ a.out
 __pycache__
 zero
 misc/*.sh
+misc/*.md
