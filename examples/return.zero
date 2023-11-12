@@ -1,0 +1,6 @@
+fn square(n) {
+    return n * n;
+}
+
+let retval = square(3);
+print(retval);
