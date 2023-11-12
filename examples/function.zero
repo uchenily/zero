@@ -1,0 +1,6 @@
+fn add(a, b) {
+    print(a + b);
+}
+
+print(1, 2);
+add(1, 2);

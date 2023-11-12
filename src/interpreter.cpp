@@ -2,6 +2,8 @@
 
 #include "assert.hpp"
 #include "fmt/core.h"
+#include "function.hpp"
+#include "token.hpp"
 #include "zero.hpp"
 
 namespace zero {
@@ -29,16 +31,20 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
     // expect(env != nullptr);
     // 保存Env
     // std::unique_ptr<Environment> previous = std::move(this->environment);
-    try {
-        this->environment = std::move(env);
+    // try {
+    //    this->environment = std::move(env);
 
-        for (const auto &stmt : stmts) {
-            execute(stmt);
-        }
-    } catch (...) {
-        // this->environment = std::move(previous);
-        this->environment = this->environment->get_enclosing();
-        throw;
+    //    for (const auto &stmt : stmts) {
+    //        execute(stmt);
+    //    }
+    //} catch (...) {
+    //    // this->environment = std::move(previous);
+    //    this->environment = this->environment->get_enclosing();
+    //    throw;
+    //}
+    EnviromentGuard guard{std::move(this->environment), std::move(env)};
+    for (const auto &stmt : stmts) {
+        execute(stmt);
     }
 
     // 恢复Env
@@ -47,7 +53,7 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
     // expect(this->environment != nullptr);
     // expect(env != nullptr);
     // 出block前, 将之前的env恢复 (按照出栈来理解)
-    this->environment = this->environment->get_enclosing();
+    // this->environment = this->environment->get_enclosing();
 }
 
 std::any Interpreter::visit_binary_expr(Binary *expr) {
@@ -148,12 +154,28 @@ std::any Interpreter::visit_assign_expr(Assign *expr) {
     return value;
 }
 
+std::any Interpreter::visit_call_expr(Call *expr) {
+    std::any callee = evaluate(expr->callee);
+    std::vector<std::any> arguments;
+    for (const auto &argument : expr->arguments) {
+        arguments.push_back(evaluate(argument));
+    }
+
+    if (callee.type() == typeid(ZeroFunction)) {
+        auto function = std::any_cast<ZeroFunction>(callee);
+        return function.call(*this, std::move(arguments));
+    }
+    // TODO
+    throw RuntimeError(Token{token_type::FN, {}, "fn", 0},
+                       "Can only call functions and classes.");
+}
+
 std::any Interpreter::visit_block_stmt(Block *stmt) {
     // 进入block, 创建一个新的environment
     // execute_block(stmt->statements, std::make_unique<Environment>());
     // 进入block前, 创建一个新的env, 需要包含当前env (按照入栈理解)
     execute_block(stmt->statements,
-                  std::make_unique<Environment>(std::move(environment)));
+                  std::make_unique<Environment>(environment.get()));
 
     return {};
 }
@@ -198,6 +220,25 @@ std::any Interpreter::visit_while_stmt(While *stmt) {
     }
 
     return {};
+}
+
+std::any Interpreter::visit_function_stmt(Function *stmt) {
+    auto function = ZeroFunction(stmt, environment.get());
+    // NOTE: 转std::any需要这个类似有拷贝构造函数
+    environment->define(stmt->name.lexeme, function);
+
+    return {};
+}
+
+std::any Interpreter::visit_return_stmt(Return *stmt) {
+    std::any value = nullptr;
+    if (stmt->value != nullptr) {
+        value = evaluate(stmt->value);
+    }
+
+    // 使用异常-捕获的方式通知函数返回
+    // FIXME: 更好的方式?
+    throw ZeroReturn{value};
 }
 
 void Interpreter::check_number_operand(const Token &op,
@@ -267,6 +308,9 @@ std::string Interpreter::stringify(const std::any &object) {
     }
     if (object.type() == typeid(bool)) {
         return std::any_cast<bool>(object) ? "true" : "false";
+    }
+    if (object.type() == typeid(ZeroFunction)) {
+        return std::any_cast<ZeroFunction>(object).to_string();
     }
 
     return "Error in 'stringify': object type not supported.";

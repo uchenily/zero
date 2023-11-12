@@ -1,6 +1,7 @@
 #pragma once
 #include "environment.hpp"
 #include "expr.hpp"
+#include "function.hpp"
 #include "stmt.hpp"
 
 namespace zero {
@@ -12,6 +13,8 @@ struct RuntimeError : public std::runtime_error {
 };
 
 class Interpreter : public ExprVisitor, public StmtVisitor {
+    friend ZeroFunction;
+
 public:
     Interpreter() : environment{std::make_unique<Environment>()} {}
     void interpret(const std::vector<std::unique_ptr<Stmt>> &stmts);
@@ -52,6 +55,6 @@ private:
     static std::string stringify(const std::any &object);
 
 private:
-    std::unique_ptr<Environment> environment;
+    std::unique_ptr<Environment> environment; // current environment
 };
 } // namespace zero

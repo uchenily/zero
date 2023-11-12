@@ -5,6 +5,7 @@ source_files = files(
   'parser.cpp',
   'interpreter.cpp',
   'environment.cpp',
+  'function.cpp',
   'zero.cpp',
 )
 

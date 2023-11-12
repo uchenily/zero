@@ -36,4 +36,5 @@ void Environment::assign(const Token &name, std::any value) {
 void Environment::define(const std::string &name, std::any value) {
     values[name] = std::move(value);
 }
+
 } // namespace zero
