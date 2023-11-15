@@ -21,6 +21,7 @@ private:
                        const std::string &reason);
 
 private:
+    static Interpreter interpreter;
     static bool has_parse_error;
     static bool has_runtime_error;
 };

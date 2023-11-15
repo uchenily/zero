@@ -14,6 +14,8 @@
 #include <string>
 
 using namespace zero;
+// 全局解释器
+Interpreter VM::interpreter{};
 bool VM::has_parse_error = false;
 bool VM::has_runtime_error = false;
 
@@ -32,7 +34,7 @@ void VM::run(std::string source) {
 
     // 解释器
     // TODO: 暂时是每一次执行都新创建一个解释器, 在REPL模式下不能利用上下文
-    Interpreter interpreter{};
+    // Interpreter interpreter{};
     interpreter.interpret(statements);
 
     if (has_runtime_error) {
