@@ -16,7 +16,7 @@ var_declaration -> "let" <IDENTIFIER> ("=" <expression>)? ";"
 ```
 
 ```
-function -> "fn" <IDENTIFIER> "(" <parameters>? ")" <block>
+func_declaration -> "fn" <IDENTIFIER> "(" <parameters>? ")" <block>
 ```
 
 ## 语句(Statements)
