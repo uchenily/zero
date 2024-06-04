@@ -1,6 +1,5 @@
 #include "zero.hpp"
 
-#include "cmdline.hpp"
 #include "fmt/core.h"
 #include "interpreter.hpp"
 #include "lexer.hpp"
@@ -66,18 +65,16 @@ void VM::run_file(const std::string &file_path) {
     run(source);
 }
 
-static void signal_handler(int signal) {
-    if (signal == SIGINT) {
-        fmt::println("Ctrl+C received. Exiting...");
-        exit(signal);
-    }
-}
-
 void VM::run_REPL() {
     std::string user_input;
 
     // 注册信号处理函数
-    signal(SIGINT, signal_handler);
+    signal(SIGINT, [](int signal) {
+        if (signal == SIGINT) {
+            fmt::println("Ctrl+C received. Exiting...");
+            exit(signal);
+        }
+    });
     while (true) {
         fmt::print("> ");
         std::getline(std::cin, user_input);
