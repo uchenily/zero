@@ -311,9 +311,10 @@ std::string Interpreter::stringify(const std::any &object) {
     }
     if (object.type() == typeid(int)) {
         std::string text = std::to_string(std::any_cast<int>(object));
-        if (text[text.length() - 2] == '.' && text[text.length() - 1] == '0') {
-            text = text.substr(0, text.length() - 2);
-        }
+        // if (text[text.length() - 2] == '.' && text[text.length() - 1] == '0')
+        // {
+        //     text = text.substr(0, text.length() - 2);
+        // }
 
         return text;
     }

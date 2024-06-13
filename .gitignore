@@ -7,3 +7,4 @@ __pycache__
 zero
 misc/*.sh
 misc/*.md
+.gdb_history
