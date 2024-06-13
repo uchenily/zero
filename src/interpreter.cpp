@@ -20,9 +20,7 @@ void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>> &stmts) {
     }
 }
 
-std::any Interpreter::evaluate(const std::unique_ptr<Expr> &expr) {
-    return expr->accept(*this);
-}
+std::any Interpreter::evaluate(Expr &expr) { return expr.accept(*this); }
 
 void Interpreter::execute(Stmt &stmt) { stmt.accept(*this); }
 
@@ -60,8 +58,8 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
 }
 
 std::any Interpreter::visit_binary_expr(Binary *expr) {
-    std::any left = evaluate(expr->left);
-    std::any right = evaluate(expr->right);
+    std::any left = evaluate(*expr->left);
+    std::any right = evaluate(*expr->right);
 
     switch (expr->op.type) {
         case token_type::NOT_EQUAL:
@@ -109,13 +107,13 @@ std::any Interpreter::visit_binary_expr(Binary *expr) {
 }
 
 std::any Interpreter::visit_grouping_expr(Grouping *expr) {
-    return evaluate(expr->expr);
+    return evaluate(*expr->expr);
 }
 
 std::any Interpreter::visit_literal_expr(Literal *expr) { return expr->value; }
 
 std::any Interpreter::visit_logical_expr(Logical *expr) {
-    auto left = evaluate(expr->left);
+    auto left = evaluate(*expr->left);
 
     if (expr->op.type == token_type::OR) {
         if (is_truthy(left)) {
@@ -127,11 +125,11 @@ std::any Interpreter::visit_logical_expr(Logical *expr) {
         }
     }
 
-    return evaluate(expr->right);
+    return evaluate(*expr->right);
 }
 
 std::any Interpreter::visit_unary_expr(Unary *expr) {
-    std::any right = evaluate(expr->right);
+    std::any right = evaluate(*expr->right);
 
     switch (expr->op.type) {
         case token_type::NOT:
@@ -151,14 +149,14 @@ std::any Interpreter::visit_variable_expr(Variable *expr) {
 }
 
 std::any Interpreter::visit_assign_expr(Assign *expr) {
-    std::any value = evaluate(expr->value);
+    std::any value = evaluate(*expr->value);
     environment->assign(expr->name, value);
 
     return value;
 }
 
 std::any Interpreter::visit_call_expr(Call *expr) {
-    std::any callee = evaluate(expr->callee);
+    std::any callee = evaluate(*expr->callee);
     std::vector<std::any> arguments;
     // for (const auto &argument : expr->arguments) {
     //     arguments.push_back(evaluate(argument));
@@ -166,7 +164,7 @@ std::any Interpreter::visit_call_expr(Call *expr) {
     auto num_arguments = expr->arguments.size();
     arguments.resize(num_arguments);
     for (auto i = 0u; i < num_arguments; i++) {
-        arguments[i] = evaluate(expr->arguments[i]);
+        arguments[i] = evaluate(*expr->arguments[i]);
     }
 
     if (callee.type() == typeid(ZeroFunction)) {
@@ -194,13 +192,13 @@ std::any Interpreter::visit_block_stmt(Block *stmt) {
 }
 
 std::any Interpreter::visit_expression_stmt(Expression *stmt) {
-    evaluate(stmt->expression);
+    evaluate(*stmt->expression);
 
     return {};
 }
 
 std::any Interpreter::visit_print_stmt(Print *stmt) {
-    std::any value = evaluate(stmt->expression);
+    std::any value = evaluate(*stmt->expression);
     fmt::println("{}", stringify(value));
 
     return {};
@@ -209,7 +207,7 @@ std::any Interpreter::visit_print_stmt(Print *stmt) {
 std::any Interpreter::visit_var_stmt(Var *stmt) {
     std::any value = nullptr;
     if (stmt->initializer != nullptr) {
-        value = evaluate(stmt->initializer);
+        value = evaluate(*stmt->initializer);
     }
 
     environment->define(stmt->name.lexeme, std::move(value));
@@ -218,7 +216,7 @@ std::any Interpreter::visit_var_stmt(Var *stmt) {
 }
 
 std::any Interpreter::visit_if_stmt(If *stmt) {
-    if (is_truthy(evaluate(stmt->condition))) {
+    if (is_truthy(evaluate(*stmt->condition))) {
         execute(*stmt->then_branch);
     } else if (stmt->else_branch != nullptr) {
         execute(*stmt->else_branch);
@@ -228,7 +226,7 @@ std::any Interpreter::visit_if_stmt(If *stmt) {
 }
 
 std::any Interpreter::visit_while_stmt(While *stmt) {
-    while (is_truthy(evaluate(stmt->condition))) {
+    while (is_truthy(evaluate(*stmt->condition))) {
         execute(*stmt->body);
     }
 
@@ -246,7 +244,7 @@ std::any Interpreter::visit_function_stmt(Function *stmt) {
 std::any Interpreter::visit_return_stmt(Return *stmt) {
     std::any value = nullptr;
     if (stmt->value != nullptr) {
-        value = evaluate(stmt->value);
+        value = evaluate(*stmt->value);
     }
 
     // 使用异常-捕获的方式通知函数返回

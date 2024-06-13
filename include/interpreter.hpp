@@ -49,7 +49,7 @@ public:
 
 private:
     // 表达式求值
-    std::any evaluate(const std::unique_ptr<Expr> &expr);
+    std::any evaluate(Expr &expr);
     // 执行语句
     void execute(Stmt &stmt);
     void execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
