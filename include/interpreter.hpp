@@ -51,7 +51,7 @@ private:
     // 表达式求值
     std::any evaluate(const std::unique_ptr<Expr> &expr);
     // 执行语句
-    void execute(const std::unique_ptr<Stmt> &stmt);
+    void execute(Stmt &stmt);
     void execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
                        std::unique_ptr<Environment> env);
 

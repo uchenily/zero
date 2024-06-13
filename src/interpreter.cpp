@@ -13,7 +13,7 @@ namespace zero {
 void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>> &stmts) {
     try {
         for (const auto &stmt : stmts) {
-            execute(stmt);
+            execute(*stmt);
         }
     } catch (const RuntimeError &err) {
         VM::runtime_error(err);
@@ -24,9 +24,7 @@ std::any Interpreter::evaluate(const std::unique_ptr<Expr> &expr) {
     return expr->accept(*this);
 }
 
-void Interpreter::execute(const std::unique_ptr<Stmt> &stmt) {
-    stmt->accept(*this);
-}
+void Interpreter::execute(Stmt &stmt) { stmt.accept(*this); }
 
 void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
                                 std::unique_ptr<Environment> env) {
@@ -49,7 +47,7 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
     // 在新环境中执行, 执行完后, 恢复之前的环境
     EnviromentGuard guard{this, std::move(env)};
     for (const auto &stmt : stmts) {
-        execute(stmt);
+        execute(*stmt);
     }
 
     // 恢复Env
@@ -221,9 +219,9 @@ std::any Interpreter::visit_var_stmt(Var *stmt) {
 
 std::any Interpreter::visit_if_stmt(If *stmt) {
     if (is_truthy(evaluate(stmt->condition))) {
-        execute(stmt->then_branch);
+        execute(*stmt->then_branch);
     } else if (stmt->else_branch != nullptr) {
-        execute(stmt->else_branch);
+        execute(*stmt->else_branch);
     }
 
     return {};
@@ -231,7 +229,7 @@ std::any Interpreter::visit_if_stmt(If *stmt) {
 
 std::any Interpreter::visit_while_stmt(While *stmt) {
     while (is_truthy(evaluate(stmt->condition))) {
-        execute(stmt->body);
+        execute(*stmt->body);
     }
 
     return {};
