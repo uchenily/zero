@@ -21,9 +21,7 @@ meson wrap install fmt
 
 ```shell
 meson setup build
-meson build -C build
-# 将安装可执行文件zero到当前项目目录下
-meson install -C build
+meson compile -C build
 ```
 
 4. 执行测试
