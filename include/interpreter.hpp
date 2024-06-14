@@ -16,10 +16,10 @@ class Interpreter : public ExprVisitor, public StmtVisitor {
     friend ZeroFunction;
 
 public:
-    Interpreter()
-        : environment{std::make_unique<Environment>()},
-          globals{environment.get()} {
-        // 初始化的时候, environment也就是globals环境
+    Interpreter() {
+        globals = std::make_unique<Environment>();
+        environment
+            = globals.get(); // 初始化的时候, environment也就是globals环境
         // 在函数调用进入时, environment会发生改变
         // 在函数调用完成时, environment又恢复回来(globals环境)
         register_functions();
@@ -53,7 +53,7 @@ private:
     // 执行语句
     void execute(Stmt &stmt);
     void execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
-                       std::unique_ptr<Environment> env);
+                       Environment *env);
 
     static void check_number_operand(const Token &op, const std::any &operand);
     static void check_number_operands(const Token &op,
@@ -64,7 +64,7 @@ private:
     static std::string stringify(const std::any &object);
 
     // helper function
-    Environment *get_globals() { return globals; }
+    Environment *get_globals() { return globals.get(); }
     void register_functions();
 
 private:
@@ -73,24 +73,23 @@ private:
         // This simulates "finally" keyword usage in executeBlock of Java
         // version "execute" can throw "ReturnException" and we need to unwind
         // the stack and return to previous enviroment on each scope exit
-        EnviromentGuard(Interpreter *interpreter,
-                        std::unique_ptr<Environment> new_env)
-            : interpreter{interpreter},
-              previous{std::move(interpreter->environment)} {
+        EnviromentGuard(Interpreter *interpreter, Environment *new_env)
+            : interpreter{interpreter}, previous{interpreter->environment} {
             // 设置新环境
-            interpreter->environment = std::move(new_env);
+            interpreter->environment = new_env;
         }
 
         // 恢复原环境
-        ~EnviromentGuard() { interpreter->environment = std::move(previous); }
+        ~EnviromentGuard() { interpreter->environment = previous; }
 
     private:
         Interpreter *interpreter;
-        std::unique_ptr<Environment> previous;
+        Environment *previous;
     };
 
 private:
-    std::unique_ptr<Environment> environment; // 解释器当前环境
-    Environment *const globals; // 解释器global环境, 初始化后指针不再改变
+    Environment *environment; // 解释器当前环境
+    std::unique_ptr<Environment>
+        globals; // 解释器global环境, 初始化后指针不再改变
 };
 } // namespace zero

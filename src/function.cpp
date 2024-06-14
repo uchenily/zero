@@ -14,13 +14,13 @@ std::any ZeroFunction::call(Interpreter &interpreter,
                             std::vector<std::any> arguments) {
     // auto env = std::make_unique<Environment>(closure);
     // 创建一个新的环境, 包含全局环境
-    auto env = std::make_unique<Environment>(interpreter.get_globals());
+    auto env = Environment(interpreter.get_globals());
     for (auto i = 0u; i < declaration->params.size(); i++) {
-        env->define(declaration->params[i].lexeme, arguments[i]);
+        env.define(declaration->params[i].lexeme, arguments[i]);
     }
 
     try {
-        interpreter.execute_block(declaration->body, std::move(env));
+        interpreter.execute_block(declaration->body, &env);
     } catch (ZeroReturn &returnValue) {
         return returnValue.value;
     }

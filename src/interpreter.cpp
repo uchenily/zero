@@ -25,7 +25,7 @@ std::any Interpreter::evaluate(Expr &expr) { return expr.accept(*this); }
 void Interpreter::execute(Stmt &stmt) { stmt.accept(*this); }
 
 void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
-                                std::unique_ptr<Environment> env) {
+                                Environment *env) {
     // expect(this->environment != nullptr);
     // expect(env != nullptr);
     // 保存Env
@@ -43,7 +43,7 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt>> &stmts,
     //}
 
     // 在新环境中执行, 执行完后, 恢复之前的环境
-    EnviromentGuard guard{this, std::move(env)};
+    EnviromentGuard guard{this, env};
     for (const auto &stmt : stmts) {
         execute(*stmt);
     }
@@ -185,8 +185,8 @@ std::any Interpreter::visit_block_stmt(Block *stmt) {
     // 进入block, 创建一个新的environment
     // execute_block(stmt->statements, std::make_unique<Environment>());
     // 进入block前, 创建一个新的env, 需要包含当前env (按照入栈理解)
-    execute_block(stmt->statements,
-                  std::make_unique<Environment>(environment.get()));
+    auto env = Environment(environment);
+    execute_block(stmt->statements, &env);
 
     return {};
 }
