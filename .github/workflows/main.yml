@@ -26,20 +26,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install meson ninja
-          mkdir subprojects
-          meson wrap install fmt
 
       - name: Configure
-        run: meson setup --reconfigure build
+        run: meson setup build
 
       - name: Build
         run: meson compile -C build
 
-      - name: Configure
-        run: meson setup --reconfigure build
-
       - name: Run tests
-        run: make tests
-
-      - name: Run examples
-        run: make examples
+        run: meson test -C build
