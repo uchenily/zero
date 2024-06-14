@@ -10,21 +10,14 @@
 pip install -U meson ninja
 ```
 
-2. (可选项)需要安装依赖 `libfmt>=9.1.0`, 如果系统安装版本不满足要求, 可以选择通过meson安装
-
-```shell
-mkdir subprojects
-meson wrap install fmt
-```
-
-3. 编译项目
+2. 编译项目
 
 ```shell
 meson setup build
 meson compile -C build
 ```
 
-4. 执行测试
+3. 执行测试
 
 执行REPL (Ctrl-C/Ctrl-D退出)
 

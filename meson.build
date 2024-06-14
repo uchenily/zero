@@ -11,7 +11,7 @@ includes = include_directories('include')
 
 compile_args = []
 
-fmt_dep = dependency('fmt')
+fmt_dep = dependency('fmt', version >= '9.1.0')
 dependencies = []
 dependencies += fmt_dep
 
