@@ -9,6 +9,10 @@ setup:
 build:
     meson compile -C build
 
+# test all examples/*.zero files
+test-all:
+    meson test -C build
+
 # run zero
 run:
     ./build/src/zero

@@ -22,9 +22,9 @@ zero_dep = declare_dependency(
 
 dependencies += zero_dep
 
-executable('zero', 'main.cpp',
+zero = executable('zero', 'main.cpp',
   include_directories: includes,
   cpp_args: compile_args,
-  install: true,
-  install_dir: meson.project_source_root(),
+  # install: true,
+  # install_dir: meson.project_source_root(),
   dependencies: dependencies)
