@@ -3,7 +3,7 @@
 #include "expr.hpp"
 #include "function.hpp"
 #include "stmt.hpp"
-#include "zero.hpp"
+#include "vm.hpp"
 
 #include <system_error>
 

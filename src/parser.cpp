@@ -1,7 +1,6 @@
 #include "parser.hpp"
 
 #include "token.hpp"
-#include "zero.hpp"
 
 #include <cassert>
 

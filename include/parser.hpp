@@ -3,7 +3,7 @@
 #include "expr.hpp"
 #include "stmt.hpp"
 #include "token.hpp"
-#include "zero.hpp"
+#include "vm.hpp"
 
 #include <memory>
 #include <stdexcept>

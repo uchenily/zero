@@ -4,7 +4,6 @@
 #include "fmt/core.h"
 #include "function.hpp"
 #include "token.hpp"
-#include "zero.hpp"
 
 #include <any>
 #include <ctime>

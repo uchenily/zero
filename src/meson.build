@@ -6,7 +6,7 @@ source_files = files(
   'interpreter.cpp',
   'environment.cpp',
   'function.cpp',
-  'zero.cpp',
+  'vm.cpp',
 )
 
 zero_lib = library('zero',

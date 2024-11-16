@@ -1,6 +1,6 @@
 #include "cmdline.hpp"
 #include "fmt/core.h"
-#include "zero.hpp"
+#include "vm.hpp"
 
 using namespace zero;
 
