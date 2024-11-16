@@ -7,17 +7,18 @@ namespace zero {
 
 enum class token_type {
     // Single character tokens(i.e., dots, parenthesis, etc.
-    LEFT_PAREN,
-    RIGHT_PAREN,
-    LEFT_BRACE,
-    RIGHT_BRACE,
-    COMMA, // 逗号
-    DOT,
-    MINUS,
-    PLUS,
-    SEMICOLON, // 冒号
-    SLASH,
-    STAR,
+    LEFT_PAREN,  // (
+    RIGHT_PAREN, // )
+    LEFT_BRACE,  // {
+    RIGHT_BRACE, // }
+    COMMA,       // ,
+    DOT,         // .
+    MINUS,       // -
+    PLUS,        // +
+    COLON,       // :
+    SEMICOLON,   // ;
+    SLASH,       // /
+    STAR,        // *
     // Single or two characters tokens(i.e., !=, ==, >=, etc.)
     EQUAL,
     EQUAL_EQUAL,
@@ -64,7 +65,7 @@ public:
 
 public:
     const token_type type;
-    const std::any literal; // 字面量, 字符串/数字/true/...
+    const std::any literal;   // 字面量, 字符串/数字/true/...
     const std::string lexeme; // 词位
     const unsigned int line;
 };
