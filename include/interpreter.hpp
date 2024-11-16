@@ -5,6 +5,8 @@
 #include "stmt.hpp"
 #include "zero.hpp"
 
+#include <system_error>
+
 namespace zero {
 class VM;
 

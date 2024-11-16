@@ -3,7 +3,7 @@ project('zero', 'cpp',
   default_options: [
     'buildtype=debug',
     'default_library=static',
-    'cpp_std=c++20',
+    'cpp_std=c++17',
     'warning_level=3'],
   meson_version: '>=1.0.0')
 
