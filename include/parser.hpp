@@ -3,6 +3,7 @@
 #include "expr.hpp"
 #include "stmt.hpp"
 #include "token.hpp"
+#include "zero.hpp"
 
 #include <memory>
 #include <stdexcept>
@@ -19,7 +20,8 @@ struct ParseError : public std::runtime_error {
 
 class Parser {
 public:
-    explicit Parser(const std::vector<Token> &tokens) : tokens(tokens){};
+    explicit Parser(VM *vm, const std::vector<Token> &tokens)
+        : vm_(vm), tokens(tokens) {};
     std::vector<std::unique_ptr<Stmt>> parse();
 
 private:
@@ -63,6 +65,7 @@ private:
     void synchronize();
 
 private:
+    VM *vm_;
     const std::vector<Token> &tokens;
     unsigned int current = 0;
 };

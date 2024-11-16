@@ -16,7 +16,7 @@ void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>> &stmts) {
             execute(*stmt);
         }
     } catch (const RuntimeError &err) {
-        VM::runtime_error(err);
+        vm_->runtime_error(err);
     }
 }
 

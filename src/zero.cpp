@@ -13,18 +13,14 @@
 #include <string>
 
 using namespace zero;
-// 全局解释器
-Interpreter VM::interpreter{};
-bool VM::has_parse_error = false;
-bool VM::has_runtime_error = false;
 
 void VM::run(std::string source) {
     // 词法解析
-    auto lexer = std::make_unique<Lexer>(std::move(source));
-    auto tokens = lexer->scan_tokens();
+    auto lexer = Lexer(std::move(source));
+    auto tokens = lexer.scan_tokens();
 
     // 语法解析
-    Parser parser{tokens};
+    Parser parser{this, tokens};
     auto statements = parser.parse();
 
     if (has_parse_error) {
@@ -34,28 +30,27 @@ void VM::run(std::string source) {
     // 解释器
     // TODO: 暂时是每一次执行都新创建一个解释器, 在REPL模式下不能利用上下文
     // Interpreter interpreter{};
-    interpreter.interpret(statements);
+    interpreter->interpret(statements);
 
     if (has_runtime_error) {
         return;
     }
 }
 
-static bool file_exists(const std::string &file_path) {
-    std::fstream file(file_path);
-    return file.good();
-}
-
-static std::string read_file(const std::string &file_path) {
-    std::fstream file(file_path, std::ios::in | std::ios::binary);
-    std::stringstream buf;
-
-    buf << file.rdbuf();
-
-    return buf.str();
-}
-
 void VM::run_file(const std::string &file_path) {
+    auto file_exists = [](const std::string &file_path) -> bool {
+        std::fstream file(file_path);
+        return file.good();
+    };
+    auto read_file = [](const std::string &file_path) -> std::string {
+        std::fstream file(file_path, std::ios::in | std::ios::binary);
+        std::stringstream buf;
+
+        buf << file.rdbuf();
+
+        return buf.str();
+    };
+
     if (!file_exists(file_path)) {
         fmt::println("File `{}` not exist", file_path);
         return;
@@ -93,13 +88,13 @@ void VM::run_REPL() {
     }
 }
 
-void VM::report(unsigned int line,
-                const std::string &pos,
-                const std::string &reason) {
-    fmt::println("[Line {}] Error {}: {}", line, pos, reason);
-}
-
 void VM::parse_error(const Token &token, const std::string &msg) {
+    auto report = [](unsigned int line,
+                     const std::string &pos,
+                     const std::string &reason) {
+        fmt::println("[Line {}] Error {}: {}", line, pos, reason);
+    };
+
     if (token.type == token_type::END) {
         report(token.line, "at end", msg);
     } else {

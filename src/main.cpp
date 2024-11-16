@@ -26,9 +26,10 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    VM vm;
     if (file.empty()) {
-        VM::run_REPL();
+        vm.run_REPL();
     } else {
-        VM::run_file(file);
+        vm.run_file(file);
     }
 }

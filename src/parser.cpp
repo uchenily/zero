@@ -15,7 +15,7 @@ std::vector<std::unique_ptr<Stmt>> Parser::parse() {
             statements.push_back(declaration());
         }
     } catch (const ParseError &err) {
-        VM::parse_error(err.token, err.what());
+        vm_->parse_error(err.token, err.what());
         // synchronize();
     }
     return statements;
@@ -38,7 +38,7 @@ std::unique_ptr<Stmt> Parser::declaration() {
 
     return statement();
     //} catch (const ParseError &err) {
-    // VM::parse_error(err.token, err.what());
+    // vm_->parse_error(err.token, err.what());
     // synchronize();
     // return nullptr;
     // }
@@ -214,7 +214,7 @@ std::unique_ptr<Expr> Parser::assignment() {
             return std::make_unique<Assign>(std::move(name), std::move(value));
         }
 
-        VM::parse_error(equals, "Invalid assignment target.");
+        vm_->parse_error(equals, "Invalid assignment target.");
     }
 
     return expr;

@@ -2,26 +2,32 @@
 #include "interpreter.hpp"
 #include "token.hpp"
 
+#include <memory>
 #include <string>
 
-using namespace zero;
+namespace zero {
+struct RuntimeError;
+
 class VM {
+public:
+    VM() { interpreter = std::make_unique<Interpreter>(); }
 
 public:
-    static void run_REPL();
-    static void run_file(const std::string &file_path);
+    void run_REPL();
+    void run_file(const std::string &file_path);
     // static void parse_error(unsigned int line, const std::string &msg);
-    static void parse_error(const Token &token, const std::string &msg);
-    static void runtime_error(const RuntimeError &err);
+    void parse_error(const Token &token, const std::string &msg);
+    void runtime_error(const RuntimeError &err);
 
 private:
-    static void run(std::string source);
-    static void report(unsigned int line,
-                       const std::string &pos,
-                       const std::string &reason);
+    void run(std::string source);
+    void report(unsigned int line,
+                const std::string &pos,
+                const std::string &reason);
 
 private:
-    static Interpreter interpreter;
-    static bool has_parse_error;
-    static bool has_runtime_error;
+    std::unique_ptr<Interpreter> interpreter;
+    bool has_parse_error;
+    bool has_runtime_error;
 };
+} // namespace zero

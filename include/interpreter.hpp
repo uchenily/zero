@@ -3,8 +3,11 @@
 #include "expr.hpp"
 #include "function.hpp"
 #include "stmt.hpp"
+#include "zero.hpp"
 
 namespace zero {
+class VM;
+
 struct RuntimeError : public std::runtime_error {
     RuntimeError(const Token &token, const std::string &msg)
         : std::runtime_error{msg}, token{token} {}
@@ -88,6 +91,7 @@ private:
     };
 
 private:
+    VM *vm_;
     Environment *environment; // 解释器当前环境
     std::unique_ptr<Environment>
         globals; // 解释器global环境, 初始化后指针不再改变
