@@ -5,11 +5,10 @@
 #include "lexer.hpp"
 #include "parser.hpp"
 #include "token.hpp"
+#include "utils.hpp"
 
 #include <csignal>
-#include <fstream>
 #include <iostream>
-#include <sstream>
 #include <string>
 
 using namespace zero;
@@ -31,33 +30,20 @@ void VM::run(std::string source) {
     // 解释器
     // TODO: 暂时是每一次执行都新创建一个解释器, 在REPL模式下不能利用上下文
     // Interpreter interpreter{};
-    interpreter->interpret(statements);
+    interpreter_->interpret(statements);
 
-    if (has_runtime_error) {
+    if (has_runtime_error_) {
         return;
     }
 }
 
 void VM::run_file(const std::string &file_path) {
-    auto file_exists = [](const std::string &file_path) -> bool {
-        std::fstream file(file_path);
-        return file.good();
-    };
-    auto read_file = [](const std::string &file_path) -> std::string {
-        std::fstream file(file_path, std::ios::in | std::ios::binary);
-        std::stringstream buf;
-
-        buf << file.rdbuf();
-
-        return buf.str();
-    };
-
-    if (!file_exists(file_path)) {
+    if (!utils::file_exists(file_path)) {
         fmt::println("File `{}` not exist", file_path);
         return;
     }
 
-    auto source = read_file(file_path);
+    auto source = utils::read_file(file_path);
     run(source);
 }
 
@@ -91,5 +77,5 @@ void VM::run_REPL() {
 
 void VM::runtime_error(const RuntimeError &err) {
     fmt::println("[Line {}] {}", err.token.line, err.what());
-    has_runtime_error = true;
+    has_runtime_error_ = true;
 }

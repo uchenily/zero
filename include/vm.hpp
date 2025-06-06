@@ -10,7 +10,7 @@ struct RuntimeError;
 
 class VM {
 public:
-    VM() { interpreter = std::make_unique<Interpreter>(); }
+    VM() { interpreter_ = std::make_unique<Interpreter>(); }
 
 public:
     void run_REPL();
@@ -26,7 +26,7 @@ private:
                 const std::string &reason);
 
 private:
-    std::unique_ptr<Interpreter> interpreter;
-    bool has_runtime_error;
+    std::unique_ptr<Interpreter> interpreter_;
+    bool has_runtime_error_;
 };
 } // namespace zero
