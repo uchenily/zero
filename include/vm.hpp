@@ -27,7 +27,6 @@ private:
 
 private:
     std::unique_ptr<Interpreter> interpreter;
-    bool has_parse_error;
     bool has_runtime_error;
 };
 } // namespace zero

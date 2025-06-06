@@ -4,6 +4,8 @@
 
 #include <cassert>
 
+#include <fmt/base.h>
+
 namespace zero {
 
 std::vector<std::unique_ptr<Stmt>> Parser::parse() {
@@ -14,10 +16,25 @@ std::vector<std::unique_ptr<Stmt>> Parser::parse() {
             statements.push_back(declaration());
         }
     } catch (const ParseError &err) {
-        vm_->parse_error(err.token, err.what());
+        parse_error(err.token, err.what());
         // synchronize();
     }
     return statements;
+}
+
+void Parser::parse_error(const Token &token, const std::string &msg) {
+    auto report = [](unsigned int line,
+                     const std::string &pos,
+                     const std::string &reason) {
+        fmt::println("[Line {}] Error {}: {}", line, pos, reason);
+    };
+
+    if (token.type == token_type::END) {
+        report(token.line, "at end", msg);
+    } else {
+        report(token.line, "at `" + token.lexeme + "`", msg);
+    }
+    has_parse_error_ = true;
 }
 
 std::unique_ptr<Expr> Parser::expression() {
@@ -213,7 +230,7 @@ std::unique_ptr<Expr> Parser::assignment() {
             return std::make_unique<Assign>(std::move(name), std::move(value));
         }
 
-        vm_->parse_error(equals, "Invalid assignment target.");
+        parse_error(equals, "Invalid assignment target.");
     }
 
     return expr;

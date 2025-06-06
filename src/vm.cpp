@@ -20,10 +20,11 @@ void VM::run(std::string source) {
     auto tokens = lexer.scan_tokens();
 
     // 语法解析
-    Parser parser{this, tokens};
+    Parser parser{tokens};
     auto statements = parser.parse();
 
-    if (has_parse_error) {
+    if (parser.has_error()) {
+        fmt::println("parse error");
         return;
     }
 
@@ -84,23 +85,8 @@ void VM::run_REPL() {
         run(user_input);
 
         // 下一轮重置状态
-        has_parse_error = false;
+        // has_parse_error = false;
     }
-}
-
-void VM::parse_error(const Token &token, const std::string &msg) {
-    auto report = [](unsigned int line,
-                     const std::string &pos,
-                     const std::string &reason) {
-        fmt::println("[Line {}] Error {}: {}", line, pos, reason);
-    };
-
-    if (token.type == token_type::END) {
-        report(token.line, "at end", msg);
-    } else {
-        report(token.line, "at `" + token.lexeme + "`", msg);
-    }
-    has_parse_error = true;
 }
 
 void VM::runtime_error(const RuntimeError &err) {
