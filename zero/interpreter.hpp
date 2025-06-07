@@ -2,6 +2,7 @@
 #include "environment.hpp"
 #include "expr.hpp"
 #include "function.hpp"
+#include "parser.hpp"
 #include "stmt.hpp"
 #include "vm.hpp"
 
@@ -31,7 +32,7 @@ public:
     }
 
 public:
-    void interpret(const std::vector<std::unique_ptr<Stmt>> &stmts);
+    void interpret(const std::unique_ptr<Program> &stmts);
     // Expr抽象类方法
     std::any visit_binary_expr(Binary *expr) override;
     std::any visit_grouping_expr(Grouping *expr) override;

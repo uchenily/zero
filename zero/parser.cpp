@@ -8,7 +8,7 @@
 
 namespace zero {
 
-std::vector<std::unique_ptr<Stmt>> Parser::parse() {
+std::unique_ptr<Program> Parser::parse_program() {
     // program -> declaration* END
     std::vector<std::unique_ptr<Stmt>> statements;
     try {
@@ -19,7 +19,7 @@ std::vector<std::unique_ptr<Stmt>> Parser::parse() {
         parse_error(err.token, err.what());
         // synchronize();
     }
-    return statements;
+    return std::make_unique<Program>(std::move(statements));
 }
 
 void Parser::parse_error(const Token &token, const std::string &msg) {

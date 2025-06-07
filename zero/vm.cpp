@@ -20,7 +20,7 @@ void VM::run(std::string source) {
 
     // 语法解析
     Parser parser{tokens};
-    auto statements = parser.parse();
+    auto program = parser.parse_program();
 
     if (parser.has_error()) {
         fmt::println("parse error");
@@ -30,7 +30,7 @@ void VM::run(std::string source) {
     // 解释器
     // TODO: 暂时是每一次执行都新创建一个解释器, 在REPL模式下不能利用上下文
     // Interpreter interpreter{};
-    interpreter_->interpret(statements);
+    interpreter_->interpret(program);
 
     if (has_runtime_error_) {
         return;

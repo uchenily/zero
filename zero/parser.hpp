@@ -1,6 +1,7 @@
 #pragma once
 
 #include "expr.hpp"
+#include "program.hpp"
 #include "stmt.hpp"
 #include "token.hpp"
 
@@ -21,7 +22,7 @@ struct ParseError : public std::runtime_error {
 class Parser {
 public:
     explicit Parser(const std::vector<Token> &tokens) : tokens(tokens) {};
-    std::vector<std::unique_ptr<Stmt>> parse();
+    std::unique_ptr<Program> parse_program();
 
     bool has_error() const { return has_parse_error_; }
 

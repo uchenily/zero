@@ -2,6 +2,7 @@
 
 #include "fmt/core.h"
 #include "function.hpp"
+#include "parser.hpp"
 #include "token.hpp"
 
 #include <any>
@@ -10,9 +11,9 @@
 #include <iostream>
 
 namespace zero {
-void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>> &stmts) {
+void Interpreter::interpret(const std::unique_ptr<Program> &program) {
     try {
-        for (const auto &stmt : stmts) {
+        for (const auto &stmt : program->get_statements()) {
             execute(*stmt);
         }
     } catch (const RuntimeError &err) {
