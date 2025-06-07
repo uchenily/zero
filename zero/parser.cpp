@@ -410,18 +410,6 @@ std::unique_ptr<Function> Parser::func_declaration() {
         std::move(name), std::move(parameters), std::move(body));
 }
 
-template <class... T>
-bool Parser::match(T... type) {
-    assert((... && std::is_same_v<T, token_type>) );
-
-    if ((... || check(type))) {
-        advance();
-        return true;
-    }
-
-    return false;
-}
-
 Token Parser::consume(token_type type, const std::string &msg) {
     if (check(type)) {
         return advance();
@@ -452,28 +440,28 @@ Token Parser::peek() { return tokens.at(current); }
 
 Token Parser::previous() { return tokens.at(current - 1); }
 
-void Parser::synchronize() {
-    advance();
-
-    while (!is_at_end()) {
-        if (previous().type == token_type::SEMICOLON) {
-            return;
-        }
-
-        switch (peek().type) {
-            case token_type::CLASS:
-            case token_type::FN:
-            case token_type::LET:
-            case token_type::FOR:
-            case token_type::IF:
-            case token_type::WHILE:
-            // case token_type::PRINT:
-            case token_type::RETURN:
-                return;
-            default:
-                break;
-        }
-        advance();
-    }
-}
+// void Parser::synchronize() {
+//     advance();
+//
+//     while (!is_at_end()) {
+//         if (previous().type == token_type::SEMICOLON) {
+//             return;
+//         }
+//
+//         switch (peek().type) {
+//             case token_type::CLASS:
+//             case token_type::FN:
+//             case token_type::LET:
+//             case token_type::FOR:
+//             case token_type::IF:
+//             case token_type::WHILE:
+//             // case token_type::PRINT:
+//             case token_type::RETURN:
+//                 return;
+//             default:
+//                 break;
+//         }
+//         advance();
+//     }
+// }
 } // namespace zero

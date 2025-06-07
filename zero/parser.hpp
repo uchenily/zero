@@ -4,6 +4,7 @@
 #include "stmt.hpp"
 #include "token.hpp"
 
+#include <cassert>
 #include <memory>
 #include <stdexcept>
 #include <vector>
@@ -58,14 +59,23 @@ private:
     std::unique_ptr<Function> func_declaration();
 
     template <class... T>
-    bool match(T... type);
+    bool match(T... type) {
+        assert((... && std::is_same_v<T, token_type>) );
+
+        if ((... || check(type))) {
+            advance();
+            return true;
+        }
+
+        return false;
+    }
     Token consume(token_type type, const std::string &msg);
     Token advance();
     Token peek();
     Token previous();
     bool is_at_end();
     bool check(token_type type);
-    void synchronize();
+    // void synchronize();
 
 private:
     // VM *vm_;
