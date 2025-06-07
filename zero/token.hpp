@@ -42,7 +42,7 @@ enum class token_type {
     IF,
     NIL,
     OR,
-    PRINT,
+    // PRINT,
     RETURN,
     TRUE,
     LET,

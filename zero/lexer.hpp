@@ -45,7 +45,7 @@ private:
         {"if", token_type::IF},
         {"nil", token_type::NIL},
         {"or", token_type::OR},
-        {"print", token_type::PRINT},
+        // {"print", token_type::PRINT},
         {"return", token_type::RETURN},
         {"true", token_type::TRUE},
         {"let", token_type::LET},

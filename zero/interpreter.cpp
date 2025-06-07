@@ -1,12 +1,12 @@
 #include "interpreter.hpp"
 
-#include "assert.hpp"
 #include "fmt/core.h"
 #include "function.hpp"
 #include "token.hpp"
 
 #include <any>
 #include <ctime>
+#include <iostream>
 
 namespace zero {
 void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>> &stmts) {
@@ -340,6 +340,34 @@ std::string Interpreter::stringify(const std::any &object) {
 
 void Interpreter::register_functions() {
     globals_->define(
+        "print",
+        NativeFunction{
+            []([[maybe_unused]] const std::vector<std::any> &arguments) {
+                // std::time_t t = std::time(nullptr);
+                // return static_cast<double>(t);
+                if (arguments[0].type() == typeid(std::string)) {
+                    std::cout << std::any_cast<std::string>(arguments[0])
+                              << '\n';
+                } else if (arguments[0].type() == typeid(int)) {
+                    std::cout << std::any_cast<int>(arguments[0]) << '\n';
+                } else if (arguments[0].type() == typeid(double)) {
+                    // to_string转成更可读格式
+                    std::cout
+                        << std::to_string(std::any_cast<double>(arguments[0]))
+                        << '\n';
+                } else if (arguments[0].type() == typeid(NativeFunction)) {
+                    std::cout << std::any_cast<NativeFunction>(arguments[0])
+                                     .to_string()
+                              << '\n';
+                } else {
+                    std::cout
+                        << "Unsupported type: " << arguments[0].type().name()
+                        << '\n';
+                }
+                // std::cout << "hello from native print func\n";
+                return 0;
+            }});
+    globals_->define(
         "clock",
         NativeFunction{
             []([[maybe_unused]] const std::vector<std::any> &arguments) {
@@ -351,7 +379,7 @@ void Interpreter::register_functions() {
             auto file_path = std::any_cast<std::string>(arguments[0]);
             fmt::println("reading {} ...", file_path);
             // fake
-            return std::string("example text");
+            return std::string{"example text"};
         }});
 }
 } // namespace zero

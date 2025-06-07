@@ -72,9 +72,9 @@ std::unique_ptr<Stmt> Parser::statement() {
     if (match(token_type::WHILE)) {
         return while_statement();
     }
-    if (match(token_type::PRINT)) {
-        return print_statement();
-    }
+    // if (match(token_type::PRINT)) {
+    //     return print_statement();
+    // }
     if (match(token_type::LEFT_BRACE)) {
         return std::make_unique<Block>(block());
     }
@@ -162,13 +162,13 @@ std::unique_ptr<Stmt> Parser::while_statement() {
     return std::make_unique<While>(std::move(cond), std::move(body));
 }
 
-std::unique_ptr<Stmt> Parser::print_statement() {
-    // print_stmt -> "print" expression ";"
-    auto value = expression();
-    consume(token_type::SEMICOLON, "Expect ';' after value.");
-
-    return std::make_unique<Print>(std::move(value));
-}
+// std::unique_ptr<Stmt> Parser::print_statement() {
+//     // print_stmt -> "print" expression ";"
+//     auto value = expression();
+//     consume(token_type::SEMICOLON, "Expect ';' after value.");
+//
+//     return std::make_unique<Print>(std::move(value));
+// }
 
 std::unique_ptr<Stmt> Parser::var_declaration() {
     // var_declaration -> "let" IDENTIFIER ("=" expression)? ";"
@@ -467,7 +467,7 @@ void Parser::synchronize() {
             case token_type::FOR:
             case token_type::IF:
             case token_type::WHILE:
-            case token_type::PRINT:
+            // case token_type::PRINT:
             case token_type::RETURN:
                 return;
             default:
