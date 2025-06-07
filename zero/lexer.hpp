@@ -8,7 +8,7 @@
 namespace zero {
 class Lexer {
 public:
-    explicit Lexer(std::string source) : source(std::move(source)){};
+    explicit Lexer(std::string source) : source(std::move(source)) {};
     std::vector<Token> scan_tokens();
 
 private:

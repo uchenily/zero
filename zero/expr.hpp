@@ -34,7 +34,7 @@ struct Expr {
 
 struct Binary : Expr {
     Binary(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right)
-        : left(std::move(left)), op(std::move(op)), right(std::move(right)){};
+        : left(std::move(left)), op(std::move(op)), right(std::move(right)) {};
 
     std::any accept(ExprVisitor &visitor) override {
         return visitor.visit_binary_expr(this);
@@ -46,7 +46,7 @@ struct Binary : Expr {
 };
 
 struct Grouping : Expr {
-    explicit Grouping(std::unique_ptr<Expr> expr) : expr(std::move(expr)){};
+    explicit Grouping(std::unique_ptr<Expr> expr) : expr(std::move(expr)) {};
 
     std::any accept(ExprVisitor &visitor) override {
         return visitor.visit_grouping_expr(this);
@@ -56,7 +56,7 @@ struct Grouping : Expr {
 };
 
 struct Literal : Expr {
-    explicit Literal(std::any value) : value(std::move(value)){};
+    explicit Literal(std::any value) : value(std::move(value)) {};
     std::any accept(ExprVisitor &visitor) override {
         return visitor.visit_literal_expr(this);
     }
@@ -66,7 +66,7 @@ struct Literal : Expr {
 
 struct Logical : Expr {
     Logical(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right)
-        : left(std::move(left)), op(std::move(op)), right(std::move(right)){};
+        : left(std::move(left)), op(std::move(op)), right(std::move(right)) {};
 
     std::any accept(ExprVisitor &visitor) override {
         return visitor.visit_logical_expr(this);
@@ -79,7 +79,7 @@ struct Logical : Expr {
 
 struct Unary : Expr {
     Unary(Token op, std::unique_ptr<Expr> right)
-        : op(std::move(op)), right(std::move(right)){};
+        : op(std::move(op)), right(std::move(right)) {};
     std::any accept(ExprVisitor &visitor) override {
         return visitor.visit_unary_expr(this);
     }
@@ -89,7 +89,7 @@ struct Unary : Expr {
 };
 
 struct Variable : Expr {
-    explicit Variable(Token name) : name(std::move(name)){};
+    explicit Variable(Token name) : name(std::move(name)) {};
 
     std::any accept(ExprVisitor &visitor) override {
         return visitor.visit_variable_expr(this);
@@ -100,7 +100,7 @@ struct Variable : Expr {
 
 struct Assign : Expr {
     Assign(Token name, std::unique_ptr<Expr> value)
-        : name(std::move(name)), value(std::move(value)){};
+        : name(std::move(name)), value(std::move(value)) {};
 
     std::any accept(ExprVisitor &visitor) override {
         return visitor.visit_assign_expr(this);

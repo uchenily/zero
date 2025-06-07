@@ -36,7 +36,7 @@ public:
 
 struct Block : Stmt {
     explicit Block(std::vector<std::unique_ptr<Stmt>> statements)
-        : statements(std::move(statements)){};
+        : statements(std::move(statements)) {};
 
     std::any accept(StmtVisitor &visitor) override {
         return visitor.visit_block_stmt(this);
@@ -47,7 +47,7 @@ struct Block : Stmt {
 
 struct Expression : Stmt {
     explicit Expression(std::unique_ptr<Expr> expression)
-        : expression(std::move(expression)){};
+        : expression(std::move(expression)) {};
 
     std::any accept(StmtVisitor &visitor) override {
         return visitor.visit_expression_stmt(this);
@@ -58,7 +58,7 @@ struct Expression : Stmt {
 
 struct Print : Stmt {
     explicit Print(std::unique_ptr<Expr> expression)
-        : expression(std::move(expression)){};
+        : expression(std::move(expression)) {};
 
     std::any accept(StmtVisitor &visitor) override {
         return visitor.visit_print_stmt(this);
@@ -69,7 +69,7 @@ struct Print : Stmt {
 
 struct Var : Stmt {
     Var(Token name, std::unique_ptr<Expr> initializer)
-        : name(std::move(name)), initializer(std::move(initializer)){};
+        : name(std::move(name)), initializer(std::move(initializer)) {};
 
     std::any accept(StmtVisitor &visitor) override {
         return visitor.visit_var_stmt(this);
@@ -84,7 +84,7 @@ struct If : Stmt {
        std::unique_ptr<Stmt> then_branch,
        std::unique_ptr<Stmt> else_branch)
         : condition(std::move(condition)), then_branch(std::move(then_branch)),
-          else_branch(std::move(else_branch)){};
+          else_branch(std::move(else_branch)) {};
 
     std::any accept(StmtVisitor &visitor) override {
         return visitor.visit_if_stmt(this);
@@ -97,7 +97,7 @@ struct If : Stmt {
 
 struct While : Stmt {
     While(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body)
-        : condition(std::move(condition)), body(std::move(body)){};
+        : condition(std::move(condition)), body(std::move(body)) {};
 
     std::any accept(StmtVisitor &visitor) override {
         return visitor.visit_while_stmt(this);
@@ -112,7 +112,7 @@ struct Function : Stmt {
              std::vector<Token> params,
              std::vector<std::unique_ptr<Stmt>> body)
         : name(std::move(name)), params(std::move(params)),
-          body(std::move(body)){};
+          body(std::move(body)) {};
 
     std::any accept(StmtVisitor &visitor) override {
         return visitor.visit_function_stmt(this);
@@ -125,7 +125,7 @@ struct Function : Stmt {
 
 struct Return : Stmt {
     Return(Token keyword, std::unique_ptr<Expr> value)
-        : keyword(std::move(keyword)), value(std::move(value)){};
+        : keyword(std::move(keyword)), value(std::move(value)) {};
 
     std::any accept(StmtVisitor &visitor) override {
         return visitor.visit_return_stmt(this);

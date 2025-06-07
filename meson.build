@@ -7,13 +7,13 @@ project('zero', 'cpp',
     'warning_level=3'],
   meson_version: '>=1.0.0')
 
-includes = include_directories('include')
+includes = include_directories('.')
 
 compile_args = []
 
-fmt_dep = dependency('fmt', version: '>=9.1.0')
+fmt_dep = dependency('fmt', version: '>=11.2.0')
 dependencies = []
 dependencies += fmt_dep
 
-subdir('src')
+subdir('zero')
 subdir('tests')

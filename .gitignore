@@ -4,7 +4,6 @@ build
 a.out
 *.so
 __pycache__
-zero
 misc/*.sh
 misc/*.md
 .gdb_history
