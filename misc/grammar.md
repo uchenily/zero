@@ -22,7 +22,7 @@ func_declaration -> "fn" <IDENTIFIER> "(" <parameters>? ")" <block>
 ## 语句(Statements)
 
 ```
-statement -> <if_stmt> | <for_stmt> | <while_stmt> | <print_stmt> | <block> | <return_stmt> | <expr_stmt>
+statement -> <if_stmt> | <for_stmt> | <while_stmt> | <block> | <return_stmt> | <expr_stmt>
 ```
 
 ```
@@ -35,10 +35,6 @@ for_stmt -> "for" "(" ( <var_decl> | <expr_stmt> | ";" ) <expression>? ";" <expr
 
 ```
 while_stmt -> "while" "(" <expression> ")" <statement>
-```
-
-```
-print_stmt -> "print" <expression> ";"
 ```
 
 ```

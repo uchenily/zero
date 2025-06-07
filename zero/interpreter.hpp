@@ -45,7 +45,7 @@ public:
     // Stmt抽象类方法
     std::any visit_block_stmt(Block *stmt) override;
     std::any visit_expression_stmt(Expression *stmt) override;
-    std::any visit_print_stmt(Print *stmt) override;
+    // std::any visit_print_stmt(Print *stmt) override;
     std::any visit_var_stmt(Var *stmt) override;
     std::any visit_if_stmt(If *stmt) override;
     std::any visit_while_stmt(While *stmt) override;

@@ -5,6 +5,7 @@
 #include "token.hpp"
 
 #include <any>
+#include <cassert>
 #include <ctime>
 #include <iostream>
 
@@ -196,12 +197,12 @@ std::any Interpreter::visit_expression_stmt(Expression *stmt) {
     return {};
 }
 
-std::any Interpreter::visit_print_stmt(Print *stmt) {
-    std::any value = evaluate(*stmt->expression);
-    fmt::println("{}", stringify(value));
-
-    return {};
-}
+// std::any Interpreter::visit_print_stmt(Print *stmt) {
+//     std::any value = evaluate(*stmt->expression);
+//     fmt::println("{}", stringify(value));
+//
+//     return {};
+// }
 
 std::any Interpreter::visit_var_stmt(Var *stmt) {
     std::any value = nullptr;
@@ -339,41 +340,19 @@ std::string Interpreter::stringify(const std::any &object) {
 // ---------------------------------------
 
 void Interpreter::register_functions() {
-    globals_->define(
-        "print",
-        NativeFunction{
-            []([[maybe_unused]] const std::vector<std::any> &arguments) {
-                // std::time_t t = std::time(nullptr);
-                // return static_cast<double>(t);
-                if (arguments[0].type() == typeid(std::string)) {
-                    std::cout << std::any_cast<std::string>(arguments[0])
-                              << '\n';
-                } else if (arguments[0].type() == typeid(int)) {
-                    std::cout << std::any_cast<int>(arguments[0]) << '\n';
-                } else if (arguments[0].type() == typeid(double)) {
-                    // to_string转成更可读格式
-                    std::cout
-                        << std::to_string(std::any_cast<double>(arguments[0]))
-                        << '\n';
-                } else if (arguments[0].type() == typeid(NativeFunction)) {
-                    std::cout << std::any_cast<NativeFunction>(arguments[0])
-                                     .to_string()
-                              << '\n';
-                } else {
-                    std::cout
-                        << "Unsupported type: " << arguments[0].type().name()
-                        << '\n';
-                }
-                // std::cout << "hello from native print func\n";
-                return 0;
-            }});
-    globals_->define(
-        "clock",
-        NativeFunction{
-            []([[maybe_unused]] const std::vector<std::any> &arguments) {
-                std::time_t t = std::time(nullptr);
-                return static_cast<double>(t);
-            }});
+    globals_->define("print",
+                     NativeFunction{[](const std::vector<std::any> &arguments) {
+                         fmt::println("{}", stringify(arguments[0]));
+                         return 0;
+                     }});
+
+    globals_->define("clock",
+                     NativeFunction{[](const std::vector<std::any> &arguments) {
+                         assert(arguments.empty());
+                         std::time_t t = std::time(nullptr);
+                         return static_cast<double>(t);
+                     }});
+
     globals_->define(
         "read_file", NativeFunction{[](const std::vector<std::any> &arguments) {
             auto file_path = std::any_cast<std::string>(arguments[0]);
@@ -382,4 +361,5 @@ void Interpreter::register_functions() {
             return std::string{"example text"};
         }});
 }
+
 } // namespace zero
