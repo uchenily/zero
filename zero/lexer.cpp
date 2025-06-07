@@ -89,7 +89,7 @@ void Lexer::scan_token() {
             } else if (is_alpha(c)) {
                 identifier();
             } else {
-                fmt::println("Unexpected character in line {}.", line);
+                fmt::println("Unexpected character `{}` in line {}.", c, line);
             }
         }
     }

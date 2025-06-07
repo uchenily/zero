@@ -9,7 +9,7 @@
 namespace zero {
 struct Block;
 struct Expression;
-struct Print;
+// struct Print;
 struct Var;
 struct If;
 struct While;
@@ -20,7 +20,7 @@ class StmtVisitor {
 public:
     virtual std::any visit_block_stmt(Block *stmt) = 0;
     virtual std::any visit_expression_stmt(Expression *stmt) = 0;
-    virtual std::any visit_print_stmt(Print *stmt) = 0;
+    // virtual std::any visit_print_stmt(Print *stmt) = 0;
     virtual std::any visit_var_stmt(Var *stmt) = 0;
     virtual std::any visit_if_stmt(If *stmt) = 0;
     virtual std::any visit_while_stmt(While *stmt) = 0;
@@ -56,16 +56,16 @@ struct Expression : Stmt {
     const std::unique_ptr<Expr> expression;
 };
 
-struct Print : Stmt {
-    explicit Print(std::unique_ptr<Expr> expression)
-        : expression(std::move(expression)) {};
-
-    std::any accept(StmtVisitor &visitor) override {
-        return visitor.visit_print_stmt(this);
-    }
-
-    const std::unique_ptr<Expr> expression;
-};
+// struct Print : Stmt {
+//     explicit Print(std::unique_ptr<Expr> expression)
+//         : expression(std::move(expression)) {};
+//
+//     std::any accept(StmtVisitor &visitor) override {
+//         return visitor.visit_print_stmt(this);
+//     }
+//
+//     const std::unique_ptr<Expr> expression;
+// };
 
 struct Var : Stmt {
     Var(Token name, std::unique_ptr<Expr> initializer)

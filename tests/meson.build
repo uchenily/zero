@@ -3,6 +3,11 @@ executable('test_cmdline', 'test_cmdline.cpp',
   cpp_args: compile_args,
   dependencies: dependencies)
 
+executable('test_lexer', 'test_lexer.cpp',
+  include_directories: includes,
+  cpp_args: compile_args,
+  dependencies: dependencies)
+
 all_zero_examples = [
   'examples/hello.zero',
   'examples/return.zero',
