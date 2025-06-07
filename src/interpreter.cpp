@@ -144,12 +144,12 @@ std::any Interpreter::visit_unary_expr(Unary *expr) {
 }
 
 std::any Interpreter::visit_variable_expr(Variable *expr) {
-    return environment->get(expr->name);
+    return environment_->get(expr->name);
 }
 
 std::any Interpreter::visit_assign_expr(Assign *expr) {
     std::any value = evaluate(*expr->value);
-    environment->assign(expr->name, value);
+    environment_->assign(expr->name, value);
 
     return value;
 }
@@ -184,7 +184,7 @@ std::any Interpreter::visit_block_stmt(Block *stmt) {
     // 进入block, 创建一个新的environment
     // execute_block(stmt->statements, std::make_unique<Environment>());
     // 进入block前, 创建一个新的env, 需要包含当前env (按照入栈理解)
-    auto env = Environment(environment);
+    auto env = Environment(environment_);
     execute_block(stmt->statements, &env);
 
     return {};
@@ -209,7 +209,7 @@ std::any Interpreter::visit_var_stmt(Var *stmt) {
         value = evaluate(*stmt->initializer);
     }
 
-    environment->define(stmt->name.lexeme, std::move(value));
+    environment_->define(stmt->name.lexeme, std::move(value));
 
     return {};
 }
@@ -235,7 +235,7 @@ std::any Interpreter::visit_while_stmt(While *stmt) {
 std::any Interpreter::visit_function_stmt(Function *stmt) {
     auto function = ZeroFunction(stmt);
     // NOTE: 转std::any需要这个类型有拷贝构造函数
-    environment->define(stmt->name.lexeme, function);
+    environment_->define(stmt->name.lexeme, function);
 
     return {};
 }
@@ -337,20 +337,21 @@ std::string Interpreter::stringify(const std::any &object) {
 // ---------------------------------------
 //            Native functions
 // ---------------------------------------
-std::any clock([[maybe_unused]] const std::vector<std::any> &arguments) {
-    std::time_t t = std::time(nullptr);
-    return static_cast<double>(t);
-}
-
-std::any read_file(const std::vector<std::any> &arguments) {
-    auto file_path = std::any_cast<std::string>(arguments[0]);
-    fmt::println("reading {} ...", file_path);
-    // fake
-    return std::string("example text");
-}
 
 void Interpreter::register_functions() {
-    get_globals()->define("clock", NativeFunction{clock});
-    get_globals()->define("read_file", NativeFunction{read_file});
+    globals_->define(
+        "clock",
+        NativeFunction{
+            []([[maybe_unused]] const std::vector<std::any> &arguments) {
+                std::time_t t = std::time(nullptr);
+                return static_cast<double>(t);
+            }});
+    globals_->define(
+        "read_file", NativeFunction{[](const std::vector<std::any> &arguments) {
+            auto file_path = std::any_cast<std::string>(arguments[0]);
+            fmt::println("reading {} ...", file_path);
+            // fake
+            return std::string("example text");
+        }});
 }
 } // namespace zero

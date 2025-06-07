@@ -22,9 +22,9 @@ class Interpreter : public ExprVisitor, public StmtVisitor {
 
 public:
     Interpreter() {
-        globals = std::make_unique<Environment>();
-        environment
-            = globals.get(); // 初始化的时候, environment也就是globals环境
+        globals_ = std::make_unique<Environment>();
+        environment_
+            = globals_.get(); // 初始化的时候, environment也就是globals环境
         // 在函数调用进入时, environment会发生改变
         // 在函数调用完成时, environment又恢复回来(globals环境)
         register_functions();
@@ -69,7 +69,7 @@ private:
     static std::string stringify(const std::any &object);
 
     // helper function
-    Environment *get_globals() { return globals.get(); }
+    auto get_globals() { return globals_.get(); };
     void register_functions();
 
 private:
@@ -79,13 +79,13 @@ private:
         // version "execute" can throw "ReturnException" and we need to unwind
         // the stack and return to previous enviroment on each scope exit
         EnviromentGuard(Interpreter *interpreter, Environment *new_env)
-            : interpreter{interpreter}, previous{interpreter->environment} {
+            : interpreter{interpreter}, previous{interpreter->environment_} {
             // 设置新环境
-            interpreter->environment = new_env;
+            interpreter->environment_ = new_env;
         }
 
         // 恢复原环境
-        ~EnviromentGuard() { interpreter->environment = previous; }
+        ~EnviromentGuard() { interpreter->environment_ = previous; }
 
     private:
         Interpreter *interpreter;
@@ -94,8 +94,8 @@ private:
 
 private:
     VM *vm_;
-    Environment *environment; // 解释器当前环境
+    Environment *environment_; // 解释器当前环境
     std::unique_ptr<Environment>
-        globals; // 解释器global环境, 初始化后指针不再改变
+        globals_; // 解释器global环境, 初始化后指针不再改变
 };
 } // namespace zero
