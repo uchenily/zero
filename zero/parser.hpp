@@ -1,8 +1,8 @@
 #pragma once
 
-#include "expr.hpp"
-#include "program.hpp"
-#include "stmt.hpp"
+#include "ast/expr.hpp"
+#include "ast/program.hpp"
+#include "ast/stmt.hpp"
 #include "token.hpp"
 
 #include <cassert>

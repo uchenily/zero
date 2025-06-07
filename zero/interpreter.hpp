@@ -1,9 +1,9 @@
 #pragma once
+#include "ast/expr.hpp"
+#include "ast/stmt.hpp"
 #include "environment.hpp"
-#include "expr.hpp"
 #include "function.hpp"
 #include "parser.hpp"
-#include "stmt.hpp"
 #include "vm.hpp"
 
 #include <system_error>
@@ -32,7 +32,7 @@ public:
     }
 
 public:
-    void interpret(const std::unique_ptr<Program> &stmts);
+    void interpret(const std::unique_ptr<Program> &program);
     // Expr抽象类方法
     std::any visit_binary_expr(Binary *expr) override;
     std::any visit_grouping_expr(Grouping *expr) override;

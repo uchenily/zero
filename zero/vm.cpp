@@ -5,7 +5,7 @@
 #include "lexer.hpp"
 #include "parser.hpp"
 #include "token.hpp"
-#include "utils.hpp"
+#include "utils/file_utils.hpp"
 
 #include <csignal>
 #include <iostream>

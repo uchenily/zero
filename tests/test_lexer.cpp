@@ -1,5 +1,5 @@
-#include "zero/assert.hpp"
 #include "zero/lexer.hpp"
+#include "zero/utils/assert.hpp"
 
 #include <iostream>
 
