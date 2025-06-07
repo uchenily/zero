@@ -1,0 +1,10 @@
+fn twice(func, x) {
+    return func(func(x));
+}
+
+fn add_2(x) {
+    return x + 2;
+}
+
+let res = twice(add_2, 100); // function add_2 as a argument
+print(res); // expect 104
